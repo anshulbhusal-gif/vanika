@@ -3,6 +3,7 @@ import { Sparkles, Menu, X, Heart, Shield, Users, Compass, BookOpen, Volume2, Ho
 import { ActiveView, Language } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
 import { VanikaLogo } from '../common/VanikaLogo';
+import { LanguageSelector } from '../common/LanguageSelector';
 import { getTranslation } from '../../utils/translations';
 
 interface NavbarProps {
@@ -117,6 +118,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right side actions */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
+          {/* Language Selector */}
+          <LanguageSelector className="mr-1" />
+
           {/* Talk to Oja */}
           <button
             id="btn-nav-ai-companion"

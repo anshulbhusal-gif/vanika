@@ -68,11 +68,12 @@ export class GameService {
     const whereClause: any = { isActive: true };
 
     if (filters.category) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filters.category);
       const cat = await prisma.gameCategory.findFirst({
         where: {
           OR: [
             { slug: filters.category.toLowerCase() },
-            { id: filters.category },
+            ...(isUuid ? [{ id: filters.category }] : []),
           ],
         },
       });

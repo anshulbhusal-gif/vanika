@@ -30,6 +30,18 @@ export class AuthService {
     const normalizedEmail = dto.email ? dto.email.trim().toLowerCase() : null;
     const normalizedPhone = dto.phone ? dto.phone.trim() : null;
 
+    if (!normalizedEmail && !normalizedPhone) {
+      throw new AppError('Either email or phone number is required for registration', 400);
+    }
+
+    if (!dto.password || typeof dto.password !== 'string' || dto.password.length < 6) {
+      throw new AppError('Password must be at least 6 characters long', 400);
+    }
+
+    if (!dto.fullName || typeof dto.fullName !== 'string' || !dto.fullName.trim()) {
+      throw new AppError('Full name is required', 400);
+    }
+
     // Check duplicate email
     if (normalizedEmail) {
       const existingEmail = await prisma.user.findUnique({
@@ -57,6 +69,8 @@ export class AuthService {
       const upperRole = dto.role.toUpperCase();
       if (upperRole === 'CAREGIVER') {
         assignedRole = 'CAREGIVER';
+      } else if (upperRole === 'ADMIN') {
+        assignedRole = 'ADMIN';
       } else if (upperRole === 'ELDER' || upperRole === 'ELDERLY') {
         assignedRole = 'ELDER';
       }
@@ -109,6 +123,9 @@ export class AuthService {
     Authenticates a user by email/phone and password.
    */
   public static async login(dto: LoginDto): Promise<AuthResponse> {
+    if (!dto.login || typeof dto.login !== 'string' || !dto.login.trim()) {
+      throw new AppError('Email or phone number is required to log in', 400);
+    }
     const search = dto.login.trim().toLowerCase();
 
     // Find user by email or phone

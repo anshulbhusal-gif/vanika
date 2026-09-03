@@ -1,0 +1,22 @@
+{
+  "name": "Vanika — AI Cognitive Care",
+  "short_name": "Vanika",
+  "description": "AI-powered cognitive care and memory assistance platform rooted in the languages and traditions of North Eastern India.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFBF7",
+  "theme_color": "#2D4739",
+  "icons": [
+    {
+      "src": "/hero-tea-garden.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/hero-tea-garden.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
