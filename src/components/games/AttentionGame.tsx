@@ -5,6 +5,8 @@ import { VoiceAssistant, speechEngine } from '../../utils/speech';
 import { vanikaStorage } from '../../utils/storage';
 import confetti from 'canvas-confetti';
 import { Language } from '../../types';
+import { SafeImage } from '../common/SafeImage';
+import { GameVoiceAnswerButton } from '../common/GameVoiceAnswerButton';
 
 interface AttentionGameProps {
   currentLanguage: Language;
@@ -170,17 +172,19 @@ export const AttentionGame: React.FC<AttentionGameProps> = ({ currentLanguage, o
 
         {/* Found Counter & Voice Button */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleVoiceAnswer}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border ${
-              isListening
-                ? 'bg-rose-100 text-rose-800 border-rose-300 animate-pulse'
-                : 'bg-[#EDE5D2] text-[#24483C] border-[#315C4C]/30 hover:bg-[#315C4C] hover:text-[#F8F4EA]'
-            }`}
-          >
-            <span>🎙️</span>
-            <span>{isListening ? 'Listening...' : 'Voice Answer'}</span>
-          </button>
+          <GameVoiceAnswerButton
+            options={differences.map((d) => d.name)}
+            onOptionMatched={(matchedOption) => {
+              const matched = differences.find((d) => d.name.toLowerCase() === matchedOption.toLowerCase());
+              if (matched) {
+                handleSpotDifference(matched.id);
+              }
+            }}
+            currentLanguage={currentLanguage}
+            promptMessage="Speak the item name you see in the photo"
+            disabled={isAllFound}
+            label="Speak Item"
+          />
 
           <div className="bg-[#7EA9A5]/20 border border-[#7EA9A5]/50 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-[#24483C] flex items-center gap-1.5">
             <Eye className="w-4 h-4 text-[#315C4C]" />
@@ -193,32 +197,11 @@ export const AttentionGame: React.FC<AttentionGameProps> = ({ currentLanguage, o
       <div className="bg-[#FDFBF7] border-3 border-[#315C4C] rounded-3xl p-6 sm:p-8 shadow-xl text-[#24332E]">
         {/* Interactive Landscape Display */}
         <div className="relative w-full rounded-2xl overflow-hidden shadow-lg border-2 border-[#EDE5D2] bg-[#F4EFE2]">
-          {!imageLoaded && !imageError && (
-            <div className="w-full h-72 sm:h-96 bg-gray-200 animate-pulse flex items-center justify-center text-[#315C4C] font-bold text-sm">
-              <span>🌿 Loading tranquil North Eastern landscape...</span>
-            </div>
-          )}
-
-          {imageError ? (
-            <div className="w-full h-72 sm:h-96 bg-[#24483C] text-[#F8F4EA] flex flex-col items-center justify-center p-6 text-center space-y-3">
-              <span className="text-4xl">🍃</span>
-              <h4 className="font-heading font-extrabold text-lg">Majuli Tea Garden & River Basin</h4>
-              <p className="text-xs text-[#EDE5D2]/80 max-w-md">
-                Offline Mode Active: Tranquil tea rows, Riverboat on the Brahmaputra, Brass Tea Kettle, and Kopou Orchid.
-              </p>
-            </div>
-          ) : (
-            <img
-              src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80"
-              alt="Tranquil North Eastern Tea Garden and River Scene"
-              className={`w-full h-72 sm:h-96 object-cover opacity-90 transition-opacity duration-300 ${imageLoaded ? 'opacity-90' : 'opacity-0'}`}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-            />
-          )}
-
+          <SafeImage
+            src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80"
+            alt="Tranquil North Eastern Tea Garden and River Scene"
+            className="w-full h-72 sm:h-96 opacity-90"
+          />
 
           {/* Interactive Clickable Hotspots overlay */}
           {differences.map((diff) => (

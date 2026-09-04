@@ -11,6 +11,8 @@ import { runI18nTests } from './i18n.test';
 import { runVoiceTests } from './voice.test';
 import { runOfflineTests } from './offline.test';
 import { runSecurityAuditTests } from './securityAudit.test';
+import { runSafeImageTests } from './safeImage.test';
+import { runPhotoUploadTests } from './photoUpload.test';
 
 async function main() {
   console.log('====================================================');
@@ -32,6 +34,8 @@ async function main() {
   results.push(await runVoiceTests());
   results.push(await runOfflineTests());
   results.push(await runSecurityAuditTests());
+  results.push(await runSafeImageTests());
+  results.push(await runPhotoUploadTests());
 
   console.log('\n====================================================');
   console.log('                  TEST SUMMARY                      ');

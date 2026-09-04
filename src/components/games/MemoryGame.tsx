@@ -6,6 +6,8 @@ import { soundSynth } from '../../utils/audioSynth';
 import { vanikaStorage } from '../../utils/storage';
 import confetti from 'canvas-confetti';
 import { Language, MemoryPhotoItem } from '../../types';
+import { SafeImage } from '../common/SafeImage';
+import { GameVoiceAnswerButton } from '../common/GameVoiceAnswerButton';
 
 interface MemoryGameProps {
   currentLanguage: Language;
@@ -184,29 +186,11 @@ export const MemoryGame: React.FC<MemoryGameProps> = ({ currentLanguage, onBackT
           {/* Photograph Container */}
           <div className="md:col-span-6 relative">
             <div className="bg-white p-3.5 rounded-2xl shadow-md border-2 border-[#EDE5D2] relative overflow-hidden group">
-              {!imgLoaded && !imgError && (
-                <div className="w-full h-64 sm:h-80 bg-gray-200 animate-pulse rounded-xl flex items-center justify-center text-[#315C4C] text-sm font-bold">
-                  <span>📸 Loading memory photo...</span>
-                </div>
-              )}
-
-              {imgError ? (
-                <div className="w-full h-64 sm:h-80 bg-[#315C4C] text-[#F8F4EA] rounded-xl flex flex-col items-center justify-center p-4 text-center space-y-2">
-                  <span className="text-4xl">🖼️</span>
-                  <p className="font-heading font-extrabold text-base">{currentItem.title}</p>
-                  <p className="text-xs text-[#EDE5D2]/80">{currentItem.personName} ({currentItem.relationship})</p>
-                </div>
-              ) : (
-                <img
-                  src={currentItem.imageUrl}
-                  alt={currentItem.title}
-                  className={`w-full h-64 sm:h-80 object-cover rounded-xl transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                  onLoad={() => setImgLoaded(true)}
-                  onError={() => setImgError(true)}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-              )}
+              <SafeImage
+                src={currentItem.imageUrl}
+                alt={currentItem.title}
+                className="w-full h-64 sm:h-80 rounded-xl"
+              />
 
               <div className="mt-2.5 flex items-center justify-between text-xs text-[#4A5B55] px-1 font-semibold">
                 <span>📍 {currentItem.location}</span>
@@ -266,9 +250,19 @@ export const MemoryGame: React.FC<MemoryGameProps> = ({ currentLanguage, onBackT
 
         {/* 4 Large Touch Target Options */}
         <div className="mt-8 pt-6 border-t border-[#315C4C]/15">
-          <label className="block text-sm sm:text-base font-bold text-[#24483C] mb-3">
-            Select the person in this memory:
-          </label>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <label className="text-sm sm:text-base font-bold text-[#24483C]">
+              Select the person in this memory:
+            </label>
+            <GameVoiceAnswerButton
+              options={currentItem.options}
+              onOptionMatched={(matchedOption) => handleSelectOption(matchedOption)}
+              currentLanguage={currentLanguage}
+              promptMessage="Speak the name of the person in the photo"
+              disabled={selectedAnswer !== null && isCorrect === true}
+              label="Speak Answer"
+            />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {currentItem.options.map((option) => {
               const isSelected = selectedAnswer === option;

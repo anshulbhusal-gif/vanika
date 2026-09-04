@@ -6,6 +6,7 @@ import { soundSynth } from '../../utils/audioSynth';
 import { VoiceAssistant, speechEngine } from '../../utils/speech';
 import { vanikaStorage } from '../../utils/storage';
 import confetti from 'canvas-confetti';
+import { GameVoiceAnswerButton } from '../common/GameVoiceAnswerButton';
 
 interface SequenceGameProps {
   currentLanguage: Language;
@@ -278,6 +279,21 @@ export const SequenceGame: React.FC<SequenceGameProps> = ({ currentLanguage, onB
             <RotateCcw className="w-4 h-4" />
             <span>Shuffle Again</span>
           </button>
+
+          <GameVoiceAnswerButton
+            options={['Check Sequence', 'Verify Order', 'Reset Sequence', 'Shuffle Cards', ...steps.map((s) => s.title)]}
+            onOptionMatched={(matchedOption) => {
+              const lower = matchedOption.toLowerCase();
+              if (lower.includes('check') || lower.includes('verify')) {
+                handleVerify();
+              } else if (lower.includes('reset') || lower.includes('shuffle')) {
+                handleReset();
+              }
+            }}
+            currentLanguage={currentLanguage}
+            promptMessage="Say check sequence or shuffle cards"
+            label="Speak Action"
+          />
 
           <button
             onClick={handleVerify}

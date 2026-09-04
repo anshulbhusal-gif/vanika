@@ -114,6 +114,27 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeView]);
 
+  // Redirect authenticated users away from login/signup to their dashboard
+  useEffect(() => {
+    if (!auth.isLoading && auth.isAuthenticated && (activeView === 'login' || activeView === 'signup')) {
+      const role = auth.user?.role;
+      if (role === 'CAREGIVER' || role === 'ADMIN') {
+        setActiveView('caregiver-portal');
+      } else {
+        setActiveView('patient-app');
+      }
+    }
+  }, [auth.isAuthenticated, auth.isLoading, auth.user?.role, activeView]);
+
+  // Auth-gated navigation: redirect to login if unauthenticated
+  const navigateWithAuthGuard = (target: ActiveView) => {
+    if (AUTHENTICATED_VIEWS.includes(target) && !auth.isAuthenticated && !auth.isLoading) {
+      setActiveView('login');
+    } else {
+      setActiveView(target);
+    }
+  };
+
   const isAuthenticated = AUTHENTICATED_VIEWS.includes(activeView);
   const isFullscreen = FULLSCREEN_VIEWS.includes(activeView);
   const isLanding = activeView === 'home' || activeView === 'how-it-works' || activeView === 'features' || activeView === 'culture' || activeView === 'privacy';
@@ -132,6 +153,18 @@ function AppContent() {
           : 'bg-[#FDFBF7] text-[#2D4739]'
       }`}
     >
+      {/* ── INITIAL SESSION LOADING ── */}
+      {auth.isLoading && !auth.isAuthenticated && activeView === 'home' && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#FDFBF7]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1E3A2F] to-[#2D4739] flex items-center justify-center shadow-lg">
+              <span className="text-3xl">🌿</span>
+            </div>
+            <div className="w-8 h-8 border-3 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-bold text-[#52635D]">Loading Vanika…</p>
+          </div>
+        </div>
+      )}
       {/* ── FULLSCREEN VIEWS (Login, Signup, Onboarding) ── */}
       {isFullscreen && (
         <>
@@ -173,12 +206,13 @@ function AppContent() {
             onSelectLanguage={setCurrentLanguage}
             onOpenCompanion={() => setIsCompanionOpen(true)}
             onOpenProfile={() => setIsProfileOpen(true)}
+            isAuthenticated={auth.isAuthenticated}
           />
           <main className="flex-1">
             {activeView === 'home' && (
               <div>
                 <HeroSection
-                  onNavigate={setActiveView}
+                  onNavigate={navigateWithAuthGuard}
                   onOpenCompanion={() => setIsCompanionOpen(true)}
                   onOpenDemoStory={() => setIsDemoOpen(true)}
                   currentLanguage={currentLanguage}

@@ -26,7 +26,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (login: string, password: string) => Promise<void>;
+  login: (login: string, password: string) => Promise<AuthUser>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onLogout }
   }, []);
 
   // Login
-  const login = useCallback(async (loginIdentifier: string, password: string) => {
+  const login = useCallback(async (loginIdentifier: string, password: string): Promise<AuthUser> => {
     setError(null);
     setIsLoading(true);
 
@@ -119,6 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onLogout }
       setStoredToken(result.token);
       setToken(result.token);
       setUser(result.user);
+      return result.user;
     } catch (err: any) {
       const message = err?.message || 'Login failed. Please try again.';
       setError(message);

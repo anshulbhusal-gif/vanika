@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # ── Vanika Application Service ──
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vanika-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=postgresql://vanika:vanika@db:5432/vanika?schema=public
+      - DIRECT_URL=postgresql://vanika:vanika@db:5432/vanika?schema=public
+      - JWT_SECRET=dev_jwt_secret_vanika_cognitive_care_docker_2026
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-MY_GEMINI_API_KEY}
+      - CLIENT_URL=http://localhost:5000
+      - RUN_MIGRATIONS=true
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - vanika_uploads:/app/uploads
+
+  # ── Local PostgreSQL Database Service ──
+  db:
+    image: postgres:16-alpine
+    container_name: vanika-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vanika
+      POSTGRES_PASSWORD: vanika
+      POSTGRES_DB: vanika
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vanika -d vanika"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
+  vanika_uploads:
+    driver: local

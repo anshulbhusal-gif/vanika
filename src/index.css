@@ -16,6 +16,31 @@
     --color-teal: #6A9B96;
     --color-dark: #24332E;
     --color-dark-muted: #52635D;
+
+    /* Semantic Theme Tokens for Vanika Design System */
+    --vanika-bg-app: #FDFBF7;
+    --vanika-bg-surface: #FFFFFF;
+    --vanika-bg-subtle: #F8F4EA;
+    --vanika-bg-muted: #EDE5D2;
+    --vanika-bg-header: rgba(253, 251, 247, 0.92);
+    --vanika-text-primary: #1E3A2F;
+    --vanika-text-secondary: #2D4739;
+    --vanika-text-muted: #52635D;
+    --vanika-border: rgba(45, 71, 57, 0.15);
+    --vanika-border-strong: rgba(45, 71, 57, 0.3);
+  }
+
+  .dark, .dark-theme {
+    --vanika-bg-app: #0F1E17;
+    --vanika-bg-surface: #182E23;
+    --vanika-bg-subtle: #162B21;
+    --vanika-bg-muted: #1F3B2D;
+    --vanika-bg-header: rgba(15, 30, 23, 0.95);
+    --vanika-text-primary: #FDFBF7;
+    --vanika-text-secondary: #EAE2D2;
+    --vanika-text-muted: #C8D8CF;
+    --vanika-border: rgba(212, 175, 55, 0.2);
+    --vanika-border-strong: rgba(212, 175, 55, 0.4);
   }
 
   body {
@@ -276,30 +301,183 @@ html.font-xlarge {
   font-size: 22px;
 }
 
-/* Dark Mode Theme Overrides */
+/* ===== COMPREHENSIVE DARK MODE THEME OVERRIDES ===== */
+
+/* Base Body & App Container */
 html.dark-theme body,
 html.dark body {
   background-color: #0F1E17 !important;
   color: #FDFBF7 !important;
 }
 
+/* Surface & Panel Background Overrides */
+html.dark-theme .bg-white,
+html.dark .bg-white,
+html.dark-theme .bg-\[\#FFFFFF\],
+html.dark .bg-\[\#FFFFFF\] {
+  background-color: #182E23 !important;
+  color: #FDFBF7 !important;
+  border-color: rgba(212, 175, 55, 0.2) !important;
+}
+
 html.dark-theme .bg-\[\#FDFBF7\],
 html.dark .bg-\[\#FDFBF7\] {
+  background-color: #12221B !important;
+  color: #FDFBF7 !important;
+}
+
+html.dark-theme .bg-\[\#F8F4EA\],
+html.dark .bg-\[\#F8F4EA\] {
+  background-color: #1B3327 !important;
+  color: #FDFBF7 !important;
+  border-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+html.dark-theme .bg-\[\#EDE5D2\],
+html.dark .bg-\[\#EDE5D2\] {
+  background-color: #223D30 !important;
+  color: #FDFBF7 !important;
+}
+
+html.dark-theme .bg-\[\#F5EFE6\],
+html.dark .bg-\[\#F5EFE6\] {
+  background-color: #203A2D !important;
+  color: #FDFBF7 !important;
+}
+
+html.dark-theme .bg-\[\#F4EFE2\],
+html.dark .bg-\[\#F4EFE2\] {
+  background-color: #1A3125 !important;
+  color: #FDFBF7 !important;
+}
+
+html.dark-theme .bg-stone-50,
+html.dark .bg-stone-50,
+html.dark-theme .bg-stone-100,
+html.dark .bg-stone-100,
+html.dark-theme .bg-gray-50,
+html.dark .bg-gray-50,
+html.dark-theme .bg-gray-100,
+html.dark .bg-gray-100 {
   background-color: #162B21 !important;
   color: #FDFBF7 !important;
 }
 
-html.dark-theme .bg-white,
-html.dark .bg-white {
-  background-color: #1C3529 !important;
+/* Heading & Primary Text Overrides */
+html.dark-theme .text-\[\#1E3A2F\],
+html.dark .text-\[\#1E3A2F\],
+html.dark-theme .text-\[\#24483C\],
+html.dark .text-\[\#24483C\],
+html.dark-theme .text-\[\#2D4739\],
+html.dark .text-\[\#2D4739\] {
   color: #FDFBF7 !important;
 }
 
-html.dark-theme .text-\[\#24483C\],
-html.dark .text-\[\#24483C\],
-html.dark-theme .text-\[\#1E3A2F\],
-html.dark .text-\[\#1E3A2F\] {
+/* Secondary & Muted Caption Text Overrides */
+html.dark-theme .text-\[\#52635D\],
+html.dark .text-\[\#52635D\],
+html.dark-theme .text-\[\#4A5B55\],
+html.dark .text-\[\#4A5B55\],
+html.dark-theme .text-\[\#24332E\],
+html.dark .text-\[\#24332E\],
+html.dark-theme .text-\[\#315C4C\],
+html.dark .text-\[\#315C4C\],
+html.dark-theme .text-stone-600,
+html.dark .text-stone-600,
+html.dark-theme .text-stone-700,
+html.dark .text-stone-700,
+html.dark-theme .text-gray-600,
+html.dark .text-gray-600 {
+  color: #C8D8CF !important;
+}
+
+/* Border Overrides */
+html.dark-theme .border-\[\#2D4739\]\/10,
+html.dark .border-\[\#2D4739\]\/10,
+html.dark-theme .border-\[\#2D4739\]\/15,
+html.dark .border-\[\#2D4739\]\/15,
+html.dark-theme .border-\[\#315C4C\]\/15,
+html.dark .border-\[\#315C4C\]\/15,
+html.dark-theme .border-\[\#315C4C\]\/20,
+html.dark .border-\[\#315C4C\]\/20,
+html.dark-theme .border-\[\#315C4C\]\/25,
+html.dark .border-\[\#315C4C\]\/25,
+html.dark-theme .border-\[\#EDE5D2\],
+html.dark .border-\[\#EDE5D2\],
+html.dark-theme .border-stone-200,
+html.dark .border-stone-200,
+html.dark-theme .border-gray-200,
+html.dark .border-gray-200 {
+  border-color: rgba(212, 175, 55, 0.25) !important;
+}
+
+/* Form Controls: Inputs, Textareas, Selects & Placeholders */
+html.dark-theme input,
+html.dark input,
+html.dark-theme textarea,
+html.dark textarea,
+html.dark-theme select,
+html.dark select {
+  background-color: #162B21 !important;
   color: #FDFBF7 !important;
+  border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+html.dark-theme input::placeholder,
+html.dark input::placeholder,
+html.dark-theme textarea::placeholder,
+html.dark textarea::placeholder {
+  color: #8DA197 !important;
+}
+
+html.dark-theme select option,
+html.dark select option {
+  background-color: #162B21 !important;
+  color: #FDFBF7 !important;
+}
+
+/* Modal Backdrops & Dialog Containers */
+html.dark-theme .fixed.inset-0.bg-black\/50,
+html.dark .fixed.inset-0.bg-black\/50,
+html.dark-theme .fixed.inset-0.bg-stone-900\/50,
+html.dark .fixed.inset-0.bg-stone-900\/50 {
+  background-color: rgba(5, 12, 9, 0.82) !important;
+}
+
+html.dark-theme [role="dialog"],
+html.dark [role="dialog"],
+html.dark-theme .modal-container,
+html.dark .modal-container {
+  background-color: #182E23 !important;
+  color: #FDFBF7 !important;
+  border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Navigation & Header Overrides */
+html.dark-theme header,
+html.dark header,
+html.dark-theme #main-app-header,
+html.dark #main-app-header {
+  background-color: rgba(15, 30, 23, 0.95) !important;
+  border-color: rgba(212, 175, 55, 0.25) !important;
+}
+
+html.dark-theme aside,
+html.dark aside,
+html.dark-theme nav,
+html.dark nav {
+  background-color: #12221B !important;
+  border-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+/* SafeImage Skeleton & Error Fallback Boxes */
+html.dark-theme .safe-image-skeleton,
+html.dark .safe-image-skeleton,
+html.dark-theme .safe-image-fallback,
+html.dark .safe-image-fallback {
+  background-color: #1C3529 !important;
+  color: #EAE2D2 !important;
+  border-color: rgba(212, 175, 55, 0.25) !important;
 }
 
 /* ===== PREMIUM UI REDESIGN ADDITIONS ===== */

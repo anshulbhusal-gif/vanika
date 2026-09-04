@@ -39,8 +39,14 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+import path from 'path';
+
 // 4. Request Logging Middleware
 app.use(requestLoggerMiddleware);
+
+// 4b. Static File Serving for Uploaded Assets
+const uploadsDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsDir, { dotfiles: 'ignore', index: false }));
 
 // 5. API Routes Registration
 app.use('/api', apiRouter);

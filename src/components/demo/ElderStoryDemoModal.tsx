@@ -3,6 +3,7 @@ import { Play, Volume2, X, Sparkles, Heart, CheckCircle2, Award, Image, ArrowRig
 import { ActiveView, Language } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
 import { getTranslation } from '../../utils/translations';
+import { SafeImage } from '../common/SafeImage';
 
 interface ElderStoryDemoModalProps {
   isOpen: boolean;
@@ -190,10 +191,10 @@ export const ElderStoryDemoModal: React.FC<ElderStoryDemoModalProps> = ({
           {/* Top Persona Banner */}
           <div className="p-4 rounded-2xl bg-[#1E3A2F]/10 dark:bg-[#0F1E17] border border-[#1E3A2F]/20 dark:border-[#D4AF37]/30 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img
+              <SafeImage
                 src="/demo/demo-verandah-tea.jpg"
                 alt="Uncle Dipankar Baruah"
-                className="w-14 h-14 rounded-2xl object-cover border-2 border-[#D4AF37] shadow-sm"
+                className="w-14 h-14 rounded-2xl border-2 border-[#D4AF37] shadow-sm"
               />
               <div>
                 <h3 className="font-heading font-extrabold text-base text-[#1E3A2F] dark:text-[#FDFBF7]">
@@ -219,10 +220,10 @@ export const ElderStoryDemoModal: React.FC<ElderStoryDemoModalProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Left: High Resolution Memory Location Photo */}
             <div className="lg:col-span-6 relative rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40 shadow-lg group bg-[#0F1E17]">
-              <img
+              <SafeImage
                 src={currentCard.image}
                 alt={currentCard.title}
-                className="w-full h-72 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-72 sm:h-80 group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 flex flex-col justify-end text-white">
                 <div className="flex items-center justify-between mb-1">

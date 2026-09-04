@@ -29,6 +29,10 @@ app.use(
 );
 app.use(express.json({ limit: '10mb' }));
 
+// Static File Serving for Uploaded Assets
+const uploadsDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsDir, { dotfiles: 'ignore', index: false }));
+
 // Register modular backend API router
 app.use('/api', apiRouter);
 

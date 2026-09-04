@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Activity, Brain, Clock, ShieldCheck, UserCheck, Calendar, RefreshCw, Sparkles, AlertCircle, ArrowLeft, Download, Plus, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Heart, Activity, Brain, Clock, ShieldCheck, UserCheck, Calendar, RefreshCw, Sparkles, AlertCircle, ArrowLeft, Download, Plus, Image as ImageIcon, Trash2, Upload, Link as LinkIcon, Loader2 } from 'lucide-react';
 import { AlertCard } from './AlertCard';
 import { CognitiveTrendCharts } from './CognitiveTrendCharts';
 import { RemindersManager } from './RemindersManager';
@@ -7,6 +7,8 @@ import { CulturalCareGuide } from './CulturalCareGuide';
 import { PatientProfile, Language, ActiveView, MemoryPhotoItem } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
 import { vanikaStorage } from '../../utils/storage';
+import { SafeImage } from '../common/SafeImage';
+import { apiClient } from '../../services/api/apiClient';
 
 interface CaregiverDashboardProps {
   currentLanguage: Language;
@@ -58,6 +60,12 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   // Photo form fields
+  const [photoSourceTab, setPhotoSourceTab] = useState<'upload' | 'url'>('upload');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const [photoTitle, setPhotoTitle] = useState('');
   const [photoPerson, setPhotoPerson] = useState('');
   const [photoRel, setPhotoRel] = useState('Son');
@@ -74,7 +82,6 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
       console.warn('Notice reading profile in dashboard:', e);
     }
   }, []);
-
 
   const handleRefresh = () => {
     soundSynth.playWaterDrop();
@@ -103,12 +110,89 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
     setTimeout(() => setExportNotice(null), 4000);
   };
 
-  const handleAddPhoto = (e: React.FormEvent) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError(null);
+    const file = e.target.files?.[0];
+    if (!file) {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    // Step 8: Client-side validation
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      setFileError('Please select a valid image file in JPEG, PNG, or WebP format.');
+      e.target.value = '';
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setFileError('Please select a photo file under 5 MB in size.');
+      e.target.value = '';
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Step 9: Immediate Preview using FileReader
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      if (evt.target?.result) {
+        setPreviewUrl(evt.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!photoTitle.trim() || !photoPerson.trim()) return;
 
+    if (photoSourceTab === 'upload' && !selectedFile) {
+      setFileError('Please select a photo file to upload.');
+      return;
+    }
+
+    if (photoSourceTab === 'url' && !photoUrl.trim()) {
+      setFileError('Please enter a valid image web URL.');
+      return;
+    }
+
+    setIsUploading(true);
+    setFileError(null);
     soundSynth.playGentleChime();
+
     const optsArray = photoOptions.split(',').map(s => s.trim()).filter(Boolean);
+    let finalImageUrl = photoUrl.trim() || previewUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80';
+
+    if (photoSourceTab === 'upload' && selectedFile) {
+      try {
+        const formData = new FormData();
+        formData.append('photo', selectedFile);
+        formData.append('promptText', photoPrompt || `Can you recall who is in this memory photo taken in ${photoYear}?`);
+        formData.append('hint', photoPrompt);
+        formData.append('title', photoTitle);
+        formData.append('options', photoOptions);
+        formData.append('correctAnswer', photoPerson);
+
+        const uploadedItem = await apiClient.uploadFormData('/games/content/upload-photo', formData);
+        if (uploadedItem && uploadedItem.mediaUrl) {
+          finalImageUrl = uploadedItem.mediaUrl;
+        }
+      } catch (err: any) {
+        console.warn('Backend photo upload notice (using fallback local vault mode):', err?.message || err);
+        // Fall back to data URL preview for local vault mode if server is offline
+        if (previewUrl) {
+          finalImageUrl = previewUrl;
+        }
+      }
+    }
+
     const newPhoto: MemoryPhotoItem = {
       id: `custom-photo-${Date.now()}`,
       title: photoTitle,
@@ -116,7 +200,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
       relationship: photoRel,
       year: photoYear,
       location: photoLocation,
-      imageUrl: photoUrl.trim() || 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      imageUrl: finalImageUrl,
       audioPrompt: photoPrompt || `Can you recall who is in this memory photo taken in ${photoYear}?`,
       options: optsArray.length >= 2 ? optsArray : [photoPerson, 'Uncle Mohan', 'Dr. Sharma', 'Family Friend'],
       correctAnswer: photoPerson,
@@ -124,12 +208,18 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
     };
 
     vanikaStorage.addMemoryPhoto(newPhoto);
+    setIsUploading(false);
     setShowPhotoModal(false);
+
+    // Reset state
     setPhotoTitle('');
     setPhotoPerson('');
     setPhotoUrl('');
     setPhotoPrompt('');
-    setExportNotice('New Family Memory Photo saved to local patient vault!');
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setFileError(null);
+    setExportNotice('New Family Memory Photo saved to encrypted patient vault!');
     setTimeout(() => setExportNotice(null), 4000);
   };
 
@@ -229,18 +319,54 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
       {/* Add Memory Photo Modal */}
       {showPhotoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-[#FDFBF7] border border-[#2D4739]/30 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-[#1E3A2F]">
+          <div className="bg-[#FDFBF7] border border-[#2D4739]/30 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-[#1E3A2F] max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#2D4739]/15 pb-3">
               <h3 className="font-heading font-extrabold text-xl text-[#1E3A2F] flex items-center gap-2">
-                <span>📸</span> Upload Family Memory Photo
+                <span>📸</span> Add Family Memory Photo
               </h3>
               <button
                 onClick={() => setShowPhotoModal(false)}
                 className="w-8 h-8 rounded-full bg-[#EDE5D2] text-[#1E3A2F] hover:bg-[#C66B44] hover:text-white flex items-center justify-center transition-colors"
+                disabled={isUploading}
               >
                 ✕
               </button>
             </div>
+
+            {/* Photo Source Choice Tabs (Step 7) */}
+            <div className="flex rounded-2xl bg-[#EDE5D2]/60 p-1 border border-[#2D4739]/15">
+              <button
+                type="button"
+                onClick={() => { setPhotoSourceTab('upload'); setFileError(null); }}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  photoSourceTab === 'upload'
+                    ? 'bg-[#2D4739] text-[#FDFBF7] shadow-md'
+                    : 'text-[#1E3A2F] hover:bg-white/50'
+                }`}
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Option A: Upload Photo</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPhotoSourceTab('url'); setFileError(null); }}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  photoSourceTab === 'url'
+                    ? 'bg-[#2D4739] text-[#FDFBF7] shadow-md'
+                    : 'text-[#1E3A2F] hover:bg-white/50'
+                }`}
+              >
+                <LinkIcon className="w-3.5 h-3.5" />
+                <span>Option B: Paste Image URL</span>
+              </button>
+            </div>
+
+            {fileError && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{fileError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleAddPhoto} className="space-y-3 text-xs sm:text-sm">
               <div>
@@ -252,6 +378,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                   onChange={e => setPhotoTitle(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
                   required
+                  disabled={isUploading}
                 />
               </div>
 
@@ -265,6 +392,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                     onChange={e => setPhotoPerson(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
                     required
+                    disabled={isUploading}
                   />
                 </div>
                 <div>
@@ -275,6 +403,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                     value={photoRel}
                     onChange={e => setPhotoRel(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                    disabled={isUploading}
                   />
                 </div>
               </div>
@@ -288,6 +417,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                     value={photoYear}
                     onChange={e => setPhotoYear(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                    disabled={isUploading}
                   />
                 </div>
                 <div>
@@ -298,55 +428,52 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                     value={photoLocation}
                     onChange={e => setPhotoLocation(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                    disabled={isUploading}
                   />
                 </div>
               </div>
 
+              {/* Photo Input section based on tab choice */}
               <div>
-                <label className="block font-bold mb-1">Upload Local Image File or Image URL *</label>
-                <div className="space-y-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 5000000) {
-                          alert('File size exceeds 5MB limit. Please choose a smaller photo.');
-                          return;
-                        }
-                        const reader = new FileReader();
-                        reader.onload = (evt) => {
-                          if (evt.target?.result) {
-                            setPhotoUrl(evt.target.result as string);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="w-full text-xs text-[#1E3A2F] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#2D4739] file:text-[#FDFBF7] hover:file:bg-[#1E3A2F] cursor-pointer"
-                  />
-                  <div className="flex items-center gap-2 text-xs font-semibold text-[#52635D]">
-                    <span>Or enter web URL:</span>
-                  </div>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={photoUrl}
-                    onChange={e => setPhotoUrl(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
-                  />
-                </div>
-
-                {photoUrl && (
-                  <div className="mt-2.5 p-2 bg-[#EDE5D2]/50 border border-[#2D4739]/15 rounded-xl flex items-center gap-3">
-                    <img
-                      src={photoUrl}
-                      alt="Memory preview"
-                      className="w-14 h-14 object-cover rounded-lg border border-white shadow-xs shrink-0"
-                      onError={() => alert('Could not load image from this URL.')}
+                {photoSourceTab === 'upload' ? (
+                  <div>
+                    <label className="block font-bold mb-1">Select Image File (JPEG, PNG, WebP up to 5 MB) *</label>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleFileSelect}
+                      className="w-full text-xs text-[#1E3A2F] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#2D4739] file:text-[#FDFBF7] hover:file:bg-[#1E3A2F] cursor-pointer border border-[#2D4739]/20 rounded-xl p-1 bg-white"
+                      disabled={isUploading}
                     />
-                    <span className="text-xs font-bold text-[#1E3A2F]">Photo Preview Ready</span>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block font-bold mb-1">Image Web URL *</label>
+                    <input
+                      type="url"
+                      placeholder="https://images.unsplash.com/..."
+                      value={photoUrl}
+                      onChange={e => setPhotoUrl(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                      disabled={isUploading}
+                    />
+                  </div>
+                )}
+
+                {/* Step 9: Image Preview using SafeImage */}
+                {(previewUrl || photoUrl) && (
+                  <div className="mt-2.5 p-2 bg-[#EDE5D2]/50 border border-[#2D4739]/15 rounded-xl flex items-center gap-3 animate-fadeIn">
+                    <SafeImage
+                      src={previewUrl || photoUrl}
+                      alt="Memory preview"
+                      className="w-14 h-14 rounded-lg object-cover border border-white shadow-xs shrink-0"
+                    />
+                    <div>
+                      <span className="text-xs font-bold text-[#1E3A2F] block">Photo Preview Ready</span>
+                      <span className="text-[11px] text-[#52635D]">
+                        {selectedFile ? `${selectedFile.name} (${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)` : 'Web image URL loaded'}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -359,6 +486,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                   value={photoPrompt}
                   onChange={e => setPhotoPrompt(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                  disabled={isUploading}
                 />
               </div>
 
@@ -370,6 +498,7 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                   value={photoOptions}
                   onChange={e => setPhotoOptions(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-white border border-[#2D4739]/20"
+                  disabled={isUploading}
                 />
               </div>
 
@@ -377,15 +506,24 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPhotoModal(false)}
-                  className="px-4 py-2 rounded-xl bg-[#EDE5D2] text-[#1E3A2F] font-bold"
+                  className="px-4 py-2 rounded-xl bg-[#EDE5D2] text-[#1E3A2F] font-bold hover:bg-[#E2D8C3]"
+                  disabled={isUploading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#2D4739] text-[#FDFBF7] font-bold hover:bg-[#1E3A2F]"
+                  disabled={isUploading}
+                  className="px-5 py-2 rounded-xl bg-[#2D4739] text-[#FDFBF7] font-bold hover:bg-[#1E3A2F] flex items-center gap-2 transition-all disabled:opacity-50"
                 >
-                  Save to Encrypted Vault
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-[#D4AF37]" />
+                      <span>Saving Photo...</span>
+                    </>
+                  ) : (
+                    <span>Save to Encrypted Vault</span>
+                  )}
                 </button>
               </div>
             </form>
@@ -393,6 +531,8 @@ export const CaregiverDashboard: React.FC<CaregiverDashboardProps> = ({
 
         </div>
       )}
+
+
 
       {/* ── 4 PREMIUM METRIC CARDS WITH PROGRESS BARS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-slide-in-up-delay-1">

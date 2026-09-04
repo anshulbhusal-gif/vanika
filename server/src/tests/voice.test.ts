@@ -1,11 +1,12 @@
 import { VoiceService } from '../../../src/services/voice/VoiceService';
 import { VoiceIntentService } from '../../../src/services/voice/VoiceIntentService';
 import { VoiceState } from '../../../src/services/voice/voiceTypes';
+import { findBestMatchingOption, calculateSimilarity, normalizeText } from '../../../src/utils/voiceMatcher';
 
 export async function runVoiceTests(): Promise<{ passed: number; total: number; name: string }> {
   let passed = 0;
-  const total = 25;
-  const testName = 'Voice Interaction Foundation Suite (25 tests)';
+  const total = 30;
+  const testName = 'Voice Interaction & Game Answer Suite (30 tests)';
 
   console.log(`\n--- Running ${testName} ---`);
 
@@ -188,6 +189,41 @@ export async function runVoiceTests(): Promise<{ passed: number; total: number; 
     if (noKeyExposed) {
       passed++;
       console.log('✓ 25. Voice architecture uses local Web Speech APIs without exposing API keys');
+    }
+
+    // Test 26: Game Voice Matching — Exact option match
+    const match26 = findBestMatchingOption('Pepa', ['Pepa', 'Violin', 'Guitar', 'Harmonium']);
+    if (match26 === 'Pepa') {
+      passed++;
+      console.log('✓ 26. Game voice matching recognizes exact spoken option ("Pepa")');
+    }
+
+    // Test 27: Game Voice Matching — Sentence & filler phrase tolerance
+    const match27 = findBestMatchingOption('I think the answer is Pepa!', ['Pepa', 'Violin', 'Guitar', 'Harmonium']);
+    if (match27 === 'Pepa') {
+      passed++;
+      console.log('✓ 27. Game voice matching strips spoken filler phrases ("I think the answer is...")');
+    }
+
+    // Test 28: Game Voice Matching — Fuzzy Levenshtein / minor typo tolerance
+    const match28 = findBestMatchingOption('pepah', ['Pepa', 'Violin', 'Guitar', 'Harmonium']);
+    if (match28 === 'Pepa') {
+      passed++;
+      console.log('✓ 28. Game voice matching tolerates minor speech/phonetic variation via Levenshtein distance');
+    }
+
+    // Test 29: Game Voice Matching — Low confidence rejection (threshold < 0.6)
+    const match29 = findBestMatchingOption('completely unrelated noise', ['Pepa', 'Violin', 'Guitar', 'Harmonium'], 0.6);
+    if (match29 === null) {
+      passed++;
+      console.log('✓ 29. Weak speech match (< 0.6 confidence) safely returns null to prevent wrong answer');
+    }
+
+    // Test 30: Game Voice Matching — Empty transcript / options safety
+    const match30 = findBestMatchingOption('', ['Pepa', 'Violin']);
+    if (match30 === null) {
+      passed++;
+      console.log('✓ 30. Empty transcript or options safely returns null without throwing errors');
     }
   } catch (err) {
     console.error('Error in Voice tests:', err);

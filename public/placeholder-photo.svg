@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDFBF7" />
+      <stop offset="100%" stop-color="#EDE5D2" />
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#315C4C" />
+      <stop offset="100%" stop-color="#1E3A2F" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Frame -->
+  <rect width="400" height="300" rx="16" fill="url(#bgGrad)" stroke="#315C4C" stroke-width="3" stroke-opacity="0.3" />
+  
+  <!-- Inner Subtle Border -->
+  <rect x="12" y="12" width="376" height="276" rx="12" fill="none" stroke="#C87552" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.4" />
+  
+  <!-- Camera / Photo Icon Group -->
+  <g transform="translate(200, 125)">
+    <!-- Photo Frame Card -->
+    <rect x="-45" y="-40" width="90" height="70" rx="8" fill="#FFFFFF" stroke="#315C4C" stroke-width="3" />
+    <!-- Landscape Hills inside Photo Frame -->
+    <path d="M-43,15 L-20,-10 L5,15 Z" fill="#7EA9A5" />
+    <path d="M-10,25 L15,-15 L43,25 Z" fill="#315C4C" />
+    <!-- Sun -->
+    <circle cx="22" cy="-18" r="8" fill="#D9A441" />
+    
+    <!-- Camera Overlay Badge -->
+    <circle cx="28" cy="22" r="18" fill="url(#iconGrad)" stroke="#FFFFFF" stroke-width="2" />
+    <!-- Small Lens Icon -->
+    <circle cx="28" cy="22" r="7" fill="#FFFFFF" />
+    <circle cx="28" cy="22" r="3" fill="#315C4C" />
+  </g>
+  
+  <!-- Supportive Label -->
+  <text x="200" y="225" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="15" fill="#24483C">
+    Memory Photograph
+  </text>
+  <text x="200" y="248" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="12" fill="#4A5B55">
+    Photo Currently Unavailable
+  </text>
+</svg>

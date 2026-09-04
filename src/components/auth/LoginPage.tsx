@@ -25,12 +25,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    // Client-side validation
+    const identifier = phone.trim();
+    if (!identifier) {
+      setErrorMessage('Please enter your phone number or email address.');
+      return;
+    }
+    if (!password) {
+      setErrorMessage('Please enter your password.');
+      return;
+    }
+
+    if (isLoading) return; // prevent double-submission
     setIsLoading(true);
     try {
-      await auth.login(phone.trim(), password);
-      onNavigate('patient-app');
+      const loggedInUser = await auth.login(identifier, password);
+      // Role-based redirect using the returned user
+      const role = loggedInUser?.role ?? 'ELDER';
+      if (role === 'CAREGIVER' || role === 'ADMIN') {
+        onNavigate('caregiver-portal');
+      } else {
+        onNavigate('patient-app');
+      }
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Login failed. Please check your credentials.');
+      const msg = err?.message || '';
+      // Friendly error mapping — never expose internals
+      if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials') || msg.toLowerCase().includes('password') || msg.toLowerCase().includes('not found')) {
+        setErrorMessage('The phone number, email or password you entered is incorrect. Please try again.');
+      } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('failed to fetch')) {
+        setErrorMessage('Unable to connect. Please check your internet connection and try again.');
+      } else if (msg) {
+        setErrorMessage(msg);
+      } else {
+        setErrorMessage('Sign in failed. Please check your details and try again.');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -469,4 +469,126 @@ export class GameService {
       }
     }
   }
+
+  /**
+   * Creates a GameContentItem from a caregiver uploaded photo.
+   */
+  public static async createUploadedPhotoContent(params: {
+    ownerUserId: string;
+    promptText: string;
+    mediaUrl: string;
+    hint?: string;
+    title?: string;
+    gameId?: string;
+    options?: string[];
+    correctAnswer?: string;
+  }): Promise<any> {
+    await this.seedInitialGameContent();
+
+    let targetGameId = params.gameId;
+    if (!targetGameId) {
+      // Find a memory game to attach content to
+      const memoryGame = await prisma.game.findFirst({
+        where: {
+          OR: [
+            { gameType: 'PHOTO_RECALL' },
+            { gameType: 'CARD_MATCH' },
+            { slug: 'memory-match-assam' },
+          ],
+          isActive: true,
+        },
+      });
+
+      if (memoryGame) {
+        targetGameId = memoryGame.id;
+      } else {
+        const anyGame = await prisma.game.findFirst({ where: { isActive: true } });
+        if (!anyGame) {
+          throw new AppError('No active game found to associate uploaded photo', 400);
+        }
+        targetGameId = anyGame.id;
+      }
+    }
+
+    const title = params.title?.trim() || 'Family Memory Photo';
+    const promptText = params.promptText.trim();
+    const hint = params.hint?.trim() || null;
+
+    const contentItem = await prisma.gameContentItem.create({
+      data: {
+        gameId: targetGameId,
+        ownerUserId: params.ownerUserId,
+        title,
+        promptText,
+        audioPromptUrl: hint,
+        mediaUrl: params.mediaUrl,
+        difficultyLevel: 'EASY',
+        culturalRegion: 'Universal',
+        metadata: {
+          hint,
+          isCaregiverUpload: true,
+          uploadedAt: new Date().toISOString(),
+        },
+      },
+    });
+
+    const optionList = params.options && params.options.length > 0
+      ? params.options
+      : ['Family Member', 'Friend', 'Neighbor', 'Doctor'];
+
+    const correctAnswerStr = params.correctAnswer || optionList[0];
+
+    const optionsData = optionList.map((optText, index) => ({
+      contentItemId: contentItem.id,
+      optionText: optText.trim(),
+      isCorrect: optText.trim().toLowerCase() === correctAnswerStr.trim().toLowerCase() || index === 0,
+      displayOrder: index + 1,
+    }));
+
+    await prisma.gameOption.createMany({
+      data: optionsData,
+    });
+
+    return prisma.gameContentItem.findUnique({
+      where: { id: contentItem.id },
+      include: {
+        options: {
+          orderBy: { displayOrder: 'asc' },
+        },
+      },
+    });
+  }
+
+  /**
+   * Deletes a GameContentItem, performing safe file cleanup if an internal photo was stored.
+   */
+  public static async deleteContentItem(
+    contentItemId: string,
+    requestingUserId: string,
+    requestingUserRole: string
+  ): Promise<any> {
+    const item = await prisma.gameContentItem.findUnique({
+      where: { id: contentItemId },
+    });
+
+    if (!item) {
+      throw new AppError('Content item not found', 404);
+    }
+
+    // IDOR / RBAC Check: Must be ADMIN or owner of the item
+    if (requestingUserRole !== 'ADMIN' && item.ownerUserId !== requestingUserId) {
+      throw new AppError('Forbidden: You can only delete your own content items', 403);
+    }
+
+    // Step 6: Safe file cleanup if mediaUrl points to a local upload
+    if (item.mediaUrl && (item.mediaUrl.startsWith('/uploads/') || item.mediaUrl.startsWith('uploads/'))) {
+      const { FileStorageService } = await import('./storage/FileStorageService');
+      await FileStorageService.deleteFile(item.mediaUrl);
+    }
+
+    return prisma.gameContentItem.delete({
+      where: { id: contentItemId },
+    });
+  }
 }
+

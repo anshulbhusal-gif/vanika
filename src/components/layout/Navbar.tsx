@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Menu, X, Heart, Shield, Users, Compass, BookOpen, Volume2, Home, Activity, User, Stethoscope } from 'lucide-react';
+import { Sparkles, Menu, X, Heart, Shield, Users, Compass, BookOpen, Volume2, Home, Activity, User, Stethoscope, LogIn } from 'lucide-react';
 import { ActiveView, Language } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
 import { VanikaLogo } from '../common/VanikaLogo';
@@ -13,6 +13,7 @@ interface NavbarProps {
   onSelectLanguage?: (lang: Language) => void;
   onOpenCompanion: () => void;
   onOpenProfile: () => void;
+  isAuthenticated?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -21,7 +22,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentLanguage = 'English',
   onSelectLanguage,
   onOpenCompanion,
-  onOpenProfile
+  onOpenProfile,
+  isAuthenticated = false,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -136,6 +138,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="whitespace-nowrap">Talk to Oja</span>
           </button>
 
+          {/* Sign In — shown when NOT authenticated */}
+          {!isAuthenticated && (
+            <button
+              id="btn-nav-sign-in"
+              onClick={() => {
+                soundSynth.playSoftClick();
+                onNavigate('login');
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border-2 border-[#2D4739]/20 hover:border-[#D4AF37] text-[#1E3A2F] font-extrabold text-xs transition-all hover:shadow-md cursor-pointer"
+              aria-label="Sign in to Vanika"
+            >
+              <LogIn className="w-3.5 h-3.5 text-[#C66B44]" />
+              <span className="whitespace-nowrap">Sign In</span>
+            </button>
+          )}
+
           {/* Account */}
           <button
             id="btn-nav-account-profile"
@@ -232,6 +250,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               );
             })}
           </div>
+
+          {/* Mobile Sign In / Sign Up */}
+          {!isAuthenticated && (
+            <div className="pt-2 border-t border-[#2D4739]/10">
+              <button
+                id="btn-nav-mobile-sign-in"
+                onClick={() => handleNavClick('login')}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#1E3A2F] text-[#FDFBF7] font-extrabold text-sm cursor-pointer hover:bg-[#2D4739] transition-colors"
+                aria-label="Sign in to Vanika"
+              >
+                <LogIn className="w-4 h-4 text-[#D4AF37]" />
+                Sign In
+              </button>
+            </div>
+          )}
         </div>
       )}
     </header>

@@ -92,4 +92,71 @@ export class GameController {
       next(error);
     }
   }
+
+  public static async uploadPhoto(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user || !req.user.id) {
+        return next(new AppError('Authentication required to upload photo', 401));
+      }
+
+      if (!req.file) {
+        return next(new AppError('A photo file is required in multipart field "photo"', 400));
+      }
+
+      const promptText = req.body.promptText;
+      if (!promptText || typeof promptText !== 'string' || !promptText.trim()) {
+        return next(new AppError('Prompt text is required', 400));
+      }
+
+      const { FileStorageService } = await import('../services/storage/FileStorageService');
+      const mediaUrl = await FileStorageService.saveFile({
+        buffer: req.file.buffer,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+      });
+
+      let optionsArray: string[] | undefined;
+      if (req.body.options) {
+        if (Array.isArray(req.body.options)) {
+          optionsArray = req.body.options;
+        } else if (typeof req.body.options === 'string') {
+          optionsArray = req.body.options.split(',').map((s: string) => s.trim()).filter(Boolean);
+        }
+      }
+
+      const contentItem = await GameService.createUploadedPhotoContent({
+        ownerUserId: req.user.id,
+        promptText,
+        mediaUrl,
+        hint: req.body.hint,
+        title: req.body.title,
+        gameId: req.body.gameId,
+        options: optionsArray,
+        correctAnswer: req.body.correctAnswer,
+      });
+
+      ApiResponse.success(res, 'Photo content created successfully', contentItem, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async deleteContentItem(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user || !req.user.id) {
+        return next(new AppError('Authentication required', 401));
+      }
+
+      const { id } = req.params;
+      if (!id) {
+        return next(new AppError('Content item ID is required', 400));
+      }
+
+      const deletedItem = await GameService.deleteContentItem(id, req.user.id, req.user.role);
+      ApiResponse.success(res, 'Content item deleted successfully', deletedItem, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+

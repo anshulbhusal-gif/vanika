@@ -5,6 +5,7 @@ import { VoiceAssistant, speechEngine } from '../../utils/speech';
 import { vanikaStorage } from '../../utils/storage';
 import confetti from 'canvas-confetti';
 import { Language } from '../../types';
+import { GameVoiceAnswerButton } from '../common/GameVoiceAnswerButton';
 
 interface CulturalGameProps {
   currentLanguage: Language;
@@ -235,13 +236,24 @@ export const CulturalGame: React.FC<CulturalGameProps> = ({ currentLanguage, onB
             {current.question}
           </h3>
 
-          <button
-            onClick={handlePlayAudio}
-            className="py-2.5 px-4 rounded-xl bg-[#315C4C] hover:bg-[#24483C] text-[#F8F4EA] text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer"
-          >
-            <Volume2 className="w-4 h-4 text-[#D9A441]" />
-            <span>Hear Clue Spoken</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handlePlayAudio}
+              className="py-2.5 px-4 rounded-xl bg-[#315C4C] hover:bg-[#24483C] text-[#F8F4EA] text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <Volume2 className="w-4 h-4 text-[#D9A441]" />
+              <span>Hear Clue Spoken</span>
+            </button>
+
+            <GameVoiceAnswerButton
+              options={current.options}
+              onOptionMatched={(matchedOption) => handleSelect(matchedOption)}
+              currentLanguage={currentLanguage}
+              promptMessage={`Which item is the answer? ${current.options.join(', ')}`}
+              disabled={selected !== null && status === true}
+              label="Speak Cultural Answer"
+            />
+          </div>
         </div>
 
         {/* 4 Options */}

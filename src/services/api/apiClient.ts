@@ -115,6 +115,47 @@ async function request<T>(
   return envelope.data as T;
 }
 
+// ─── FormData Upload Method ───
+
+export async function uploadFormData<T = any>(path: string, formData: FormData): Promise<T> {
+  const url = `${API_BASE}${path}`;
+  const headers: Record<string, string> = {};
+  const token = getStoredToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+  } catch (networkError) {
+    throw new ApiError('Network error — unable to reach server', 0);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    const envelope = await response.json();
+    if (response.status === 401) {
+      clearStoredToken();
+      window.dispatchEvent(new CustomEvent('vanika:auth:logout'));
+      throw new ApiError(envelope.message || 'Session expired', 401, envelope.error);
+    }
+    if (!response.ok || !envelope.success) {
+      throw new ApiError(envelope.message || 'Upload failed', response.status, envelope.error);
+    }
+    return envelope.data as T;
+  }
+
+  if (!response.ok) {
+    throw new ApiError(`Server error (${response.status})`, response.status);
+  }
+  return undefined as unknown as T;
+}
+
 // ─── Public API Methods ───
 
 export const apiClient = {
@@ -132,6 +173,10 @@ export const apiClient = {
 
   delete: <T = any>(path: string) =>
     request<T>('DELETE', path),
+
+  uploadFormData: <T = any>(path: string, formData: FormData) =>
+    uploadFormData<T>(path, formData),
 };
 
 export default apiClient;
+

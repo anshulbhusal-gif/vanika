@@ -5,6 +5,8 @@
 > **Category:** Software | **Theme:** MedTech / Healthcare AI / Digital Inclusion  
 > **Team Name:** Aquaregia (`SIH2026_AQUAREGIA`)
 
+[![CI](https://github.com/anshulbhusal-gif/vanika/actions/workflows/ci.yml/badge.svg)](https://github.com/anshulbhusal-gif/vanika/actions/workflows/ci.yml)
+
 ---
 
 ## 📌 Executive Summary
