@@ -1,4 +1,5 @@
 import { Language } from '../types';
+import { apiClient } from '../services/api/apiClient';
 
 export interface AIServiceConfig {
   apiKey?: string;
@@ -20,7 +21,7 @@ const DEFAULT_HARDCODED_API_KEY = '';
 
 export class AIService {
   private static getStoredApiKey(): string {
-    return localStorage.getItem('vanika_gemini_api_key') || (import.meta as any).env?.VITE_GEMINI_API_KEY || (process as any).env?.GEMINI_API_KEY || '';
+    return localStorage.getItem('vanika_gemini_api_key') || '';
   }
 
   public static setStoredApiKey(key: string): void {
@@ -32,6 +33,19 @@ export class AIService {
     currentLanguage: Language = 'English',
     elderProfile: any = null
   ): Promise<string> {
+    // Route 0: Backend Express Gemini Server API (/api/companion/chat)
+    try {
+      const backendRes = await apiClient.post<any>('/companion/chat', {
+        message: userPrompt,
+        language: currentLanguage,
+      });
+      if (backendRes && (backendRes.response || backendRes.message || backendRes.text)) {
+        return backendRes.response || backendRes.message || backendRes.text;
+      }
+    } catch (backendErr) {
+      // Fallback to client side routes if backend is unavailable or not authenticated
+    }
+
     const apiKey = this.getStoredApiKey();
     const elderName = elderProfile?.elderName || 'Uncle Dipankar';
     const nickname = elderProfile?.elderNickname || 'Dipankar Kaka';

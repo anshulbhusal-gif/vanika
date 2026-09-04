@@ -4,6 +4,8 @@ import { ActiveView, Language } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
 import { VoiceAssistant } from '../../utils/speech';
 import { getTranslation } from '../../utils/translations';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../services/api/apiClient';
 
 interface PatientAppViewProps {
   currentLanguage: Language;
@@ -18,7 +20,7 @@ const getGreeting = () => {
   return { text: 'Good Evening', icon: <Moon className="w-5 h-5 text-indigo-400" />, emoji: '🌙' };
 };
 
-const RECOMMENDED_ACTIVITIES = [
+const DEFAULT_ACTIVITIES = [
   { id: 'rec-1', name: 'Memory Match', icon: '🃏', time: '5 min', difficulty: 'Easy', view: 'game-memory' as ActiveView, color: '#C66B44' },
   { id: 'rec-2', name: 'Find the Difference', icon: '🔍', time: '5 min', difficulty: 'Easy', view: 'game-attention' as ActiveView, color: '#6A9B96' },
   { id: 'rec-3', name: 'Cultural Patterns', icon: '🪡', time: '5 min', difficulty: 'Medium', view: 'game-cultural' as ActiveView, color: '#D4AF37' },
@@ -29,8 +31,34 @@ export const PatientAppView: React.FC<PatientAppViewProps> = ({
   onNavigate,
   onOpenCompanion
 }) => {
+  const { user } = useAuth();
+  const userName = user?.profile?.fullName || (user as any)?.fullName || 'Uncle Dipankar';
   const t = getTranslation(currentLanguage);
   const greeting = getGreeting();
+  const [recommendations, setRecommendations] = useState(DEFAULT_ACTIVITIES);
+
+  useEffect(() => {
+    const fetchRecs = async () => {
+      try {
+        const data = await apiClient.get<any[]>('/recommendations');
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((rec: any, idx: number) => ({
+            id: rec.id || `rec-${idx}`,
+            name: rec.title || rec.game?.title || rec.name || 'Memory Match',
+            icon: rec.icon || (idx === 0 ? '🃏' : idx === 1 ? '🔍' : '🪡'),
+            time: rec.estimatedMinutes ? `${rec.estimatedMinutes} min` : '5 min',
+            difficulty: rec.difficultyLevel || rec.difficulty || 'Easy',
+            view: (rec.gameId === 'game-attention' || rec.gameId === 'game-cultural') ? rec.gameId as ActiveView : 'game-memory' as ActiveView,
+            color: idx === 0 ? '#C66B44' : idx === 1 ? '#6A9B96' : '#D4AF37',
+          }));
+          setRecommendations(mapped);
+        }
+      } catch (err) {
+        // Fall back to default
+      }
+    };
+    fetchRecs();
+  }, []);
 
   const handleSpeakGreeting = () => {
     soundSynth.playGentleChime();
@@ -62,7 +90,7 @@ export const PatientAppView: React.FC<PatientAppViewProps> = ({
                     <span>{greeting.emoji} {greeting.text}</span>
                   </div>
                   <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-[#FDFBF7] leading-tight">
-                    Namaskar, Bhaben Kaka!
+                    Namaskar, {userName}!
                   </h1>
                   <p className="text-sm text-[#EAE2D2]/70 mt-1">
                     Ready for today's activities?
@@ -176,7 +204,7 @@ export const PatientAppView: React.FC<PatientAppViewProps> = ({
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {RECOMMENDED_ACTIVITIES.map((activity) => (
+            {recommendations.map((activity) => (
               <button
                 key={activity.id}
                 onClick={() => { soundSynth.playSoftClick(); onNavigate(activity.view); }}

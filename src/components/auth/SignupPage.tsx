@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Phone, Lock, User, ArrowRight, ArrowLeft, Users, Stethoscope } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { ActiveView, Language } from '../../types';
 
 interface SignupPageProps {
@@ -8,20 +9,32 @@ interface SignupPageProps {
 }
 
 export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
+  const auth = useAuth();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<'elder' | 'caregiver'>('elder');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await auth.register({
+        fullName: name.trim(),
+        phone: phone.trim(),
+        password,
+        role: role === 'caregiver' ? 'CAREGIVER' : 'ELDER',
+      });
       onNavigate('onboarding');
-    }, 800);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -133,6 +146,13 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
               </button>
             </div>
           </div>
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold text-center">
+              {errorMessage}
+            </div>
+          )}
 
           <button
             type="submit"

@@ -1,14 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, Eye, Zap, Flame, Calendar, TrendingUp, Clock, Award } from 'lucide-react';
-import { Language } from '../../types';
+import { Language, WeeklyProgress } from '../../types';
 import { MOCK_WEEKLY_PROGRESS } from '../../data/mockData';
+import { apiClient } from '../../services/api/apiClient';
 
 interface ProgressPageProps {
   currentLanguage: Language;
 }
 
 export const ProgressPage: React.FC<ProgressPageProps> = ({ currentLanguage }) => {
-  const weekData = MOCK_WEEKLY_PROGRESS;
+  const [weekData, setWeekData] = useState<WeeklyProgress[]>(MOCK_WEEKLY_PROGRESS);
+  const [streak, setStreak] = useState(7);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const summary = await apiClient.get<any>('/progress/summary');
+        if (summary) {
+          // Map API response to WeeklyProgress format if available
+          if (summary.currentStreak !== undefined) {
+            setStreak(summary.currentStreak);
+          }
+        }
+
+        const trends = await apiClient.get<any>('/progress/trends?range=7d');
+        if (trends && Array.isArray(trends.dataPoints) && trends.dataPoints.length > 0) {
+          const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const mapped: WeeklyProgress[] = trends.dataPoints.map((pt: any) => {
+            const d = new Date(pt.date || pt.day);
+            return {
+              day: dayNames[d.getDay()] || pt.dayLabel || 'Day',
+              activitiesCompleted: pt.sessionsCompleted || pt.activitiesCompleted || 0,
+              minutesActive: pt.totalMinutes || pt.minutesActive || 0,
+              memoryScore: pt.avgAccuracy || pt.memoryScore || 0,
+              attentionScore: pt.attentionScore || Math.round((pt.avgAccuracy || 0) * 0.95),
+              patternScore: pt.patternScore || Math.round((pt.avgAccuracy || 0) * 0.9),
+            };
+          });
+          setWeekData(mapped);
+        }
+      } catch {
+        // Offline or API error — keep mock data
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProgress();
+  }, []);
+
   const totalActivities = weekData.reduce((sum, d) => sum + d.activitiesCompleted, 0);
   const totalMinutes = weekData.reduce((sum, d) => sum + d.minutesActive, 0);
   const avgMemory = Math.round(weekData.reduce((sum, d) => sum + d.memoryScore, 0) / weekData.length);

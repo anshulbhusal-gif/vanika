@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Check, Edit3, Trash2, Sun, Cloud, Moon, Clock, X, Save } from 'lucide-react';
 import { RoutineTask } from '../../types';
 import { DEFAULT_ROUTINE_TASKS } from '../../data/mockData';
+import { apiClient } from '../../services/api/apiClient';
 
 export const DailyRoutinePage: React.FC = () => {
   const [tasks, setTasks] = useState<RoutineTask[]>(() => {
@@ -19,25 +20,62 @@ export const DailyRoutinePage: React.FC = () => {
   const [newPeriod, setNewPeriod] = useState<'morning' | 'afternoon' | 'evening'>('morning');
   const [newIcon, setNewIcon] = useState('📋');
 
+  useEffect(() => {
+    const fetchRoutines = async () => {
+      try {
+        const data = await apiClient.get<any[]>('/routines');
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: RoutineTask[] = data.map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            time: r.time || '12:00 PM',
+            period: (r.period || 'morning').toLowerCase() as 'morning' | 'afternoon' | 'evening',
+            icon: r.icon || '📋',
+            completed: r.isCompleted ?? r.completed ?? false,
+          }));
+          setTasks(mapped);
+          localStorage.setItem('vanika_routine', JSON.stringify(mapped));
+        }
+      } catch (err) {
+        // Fall back to stored state
+      }
+    };
+    fetchRoutines();
+  }, []);
+
   const saveTasks = (updated: RoutineTask[]) => {
     setTasks(updated);
     localStorage.setItem('vanika_routine', JSON.stringify(updated));
   };
 
-  const toggleCompleted = (id: string) => {
+  const toggleCompleted = async (id: string) => {
+    const target = tasks.find(t => t.id === id);
     const updated = tasks.map(t =>
       t.id === id ? { ...t, completed: !t.completed } : t
     );
     saveTasks(updated);
+
+    try {
+      if (target) {
+        await apiClient.post(`/routines/${id}/complete`, { completed: !target.completed });
+      }
+    } catch (err) {
+      // Optimistic update retained locally
+    }
   };
 
-  const deleteTask = (id: string) => {
+  const deleteTask = async (id: string) => {
     saveTasks(tasks.filter(t => t.id !== id));
+    try {
+      await apiClient.delete(`/routines/${id}`);
+    } catch (err) {
+      // Retained locally
+    }
   };
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTitle.trim()) return;
-    const task: RoutineTask = {
+    const newTask: RoutineTask = {
       id: `r-${Date.now()}`,
       time: newTime || '12:00 PM',
       title: newTitle,
@@ -45,11 +83,27 @@ export const DailyRoutinePage: React.FC = () => {
       period: newPeriod,
       completed: false,
     };
-    saveTasks([...tasks, task]);
+    const updated = [...tasks, newTask];
+    saveTasks(updated);
     resetForm();
+
+    try {
+      const created = await apiClient.post<any>('/routines', {
+        title: newTitle,
+        time: newTime || '12:00 PM',
+        period: newPeriod.toUpperCase(),
+        icon: newIcon,
+      });
+      if (created && created.id) {
+        // Update local temp id with backend id
+        setTasks(prev => prev.map(t => t.id === newTask.id ? { ...t, id: created.id } : t));
+      }
+    } catch (err) {
+      // Kept with local id
+    }
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!editingTask || !newTitle.trim()) return;
     const updated = tasks.map(t =>
       t.id === editingTask.id
@@ -57,6 +111,18 @@ export const DailyRoutinePage: React.FC = () => {
         : t
     );
     saveTasks(updated);
+
+    try {
+      await apiClient.patch(`/routines/${editingTask.id}`, {
+        title: newTitle,
+        time: newTime,
+        period: newPeriod.toUpperCase(),
+        icon: newIcon,
+      });
+    } catch (err) {
+      // Kept locally
+    }
+
     setEditingTask(null);
     resetForm();
   };

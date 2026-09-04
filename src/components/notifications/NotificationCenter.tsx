@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Check, ArrowRight, X, Trash2 } from 'lucide-react';
 import { ActiveView, AppNotification } from '../../types';
 import { MOCK_NOTIFICATIONS } from '../../data/mockData';
+import { apiClient } from '../../services/api/apiClient';
 
 interface NotificationCenterProps {
   onNavigate: (view: ActiveView) => void;
@@ -16,14 +17,48 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>(MOCK_NOTIFICATIONS);
 
-  const markAsRead = (id: string) => {
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await apiClient.get<any[]>('/notifications');
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: AppNotification[] = data.map((n: any) => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+            timestamp: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently',
+            read: n.isRead ?? n.read ?? false,
+            type: (n.type || 'info').toLowerCase(),
+            icon: n.icon || '🔔',
+            actionUrl: n.actionUrl || n.link,
+          }));
+          setNotifications(mapped);
+        }
+      } catch (err) {
+        // Fall back to mock data
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  const markAsRead = async (id: string) => {
     setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
+    try {
+      await apiClient.patch(`/notifications/${id}/read`, {});
+    } catch (err) {
+      // Best-effort optimistic UI
+    }
   };
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    try {
+      await apiClient.patch('/notifications/read-all', {});
+    } catch (err) {
+      // Best-effort optimistic UI
+    }
   };
 
   const deleteNotification = (id: string) => {

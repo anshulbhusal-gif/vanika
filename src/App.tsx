@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActiveView, AccessibilitySettings, Language } from './types';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AccessibilityBar } from './components/common/AccessibilityBar';
 import { OfflineBadge } from './components/common/OfflineBadge';
 import { Navbar } from './components/layout/Navbar';
@@ -60,7 +61,8 @@ const AUTHENTICATED_VIEWS: ActiveView[] = [
 // Views that are fullscreen (no sidebar/navbar)
 const FULLSCREEN_VIEWS: ActiveView[] = ['login', 'signup', 'onboarding'];
 
-export function App() {
+function AppContent() {
+  const auth = useAuth();
   const [activeView, setActiveView] = useState<ActiveView>('home');
   const [isCompanionOpen, setIsCompanionOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -428,6 +430,14 @@ export function App() {
       {/* Offline Badge */}
       <OfflineBadge />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider onLogout={() => { /* handled internally */ }}>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

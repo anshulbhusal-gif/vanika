@@ -8,6 +8,7 @@ import {
   AlertNotification
 } from '../types';
 import { SAMPLE_MEMORY_PHOTOS } from '../data/culturalContent';
+import { apiClient } from '../services/api/apiClient';
 
 const STORAGE_KEYS = {
   PATIENT_PROFILE: 'vanika_patient_profile',
@@ -337,6 +338,18 @@ export const vanikaStorage = {
     }
 
     this.saveCognitiveHistory(updatedHistory);
+
+    // Sync to backend express server if connected
+    try {
+      apiClient.post('/game-sessions/complete', {
+        gameId: gameType,
+        score,
+        durationSeconds: minutes * 60,
+        completedAt: new Date().toISOString(),
+      }).catch(() => { /* offline silent fallback */ });
+    } catch (e) {
+      // Offline fallback
+    }
 
     // Also update current profile memory and attention baseline
     const profile = this.getProfile();

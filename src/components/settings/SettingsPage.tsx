@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Globe, Type, Eye, Volume2, Bell, Shield, Users, Moon, Sun, ChevronRight, Save, CheckCircle2 } from 'lucide-react';
 import { AccessibilitySettings, Language } from '../../types';
 import { NER_LANGUAGES } from '../../data/mockData';
+import { apiClient } from '../../services/api/apiClient';
 
 interface SettingsPageProps {
   accessibilitySettings: AccessibilitySettings;
@@ -19,8 +20,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [saved, setSaved] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaved(true);
+    try {
+      await apiClient.patch('/accessibility', {
+        fontSize: accessibilitySettings.fontSize,
+        highContrast: accessibilitySettings.highContrast,
+        voiceReadout: accessibilitySettings.voiceReadout,
+        screenReaderOptimized: accessibilitySettings.screenReaderOptimized,
+        simplifiedNavigation: accessibilitySettings.simplifiedNavigation,
+        reducedMotion: accessibilitySettings.reducedMotion,
+        audioCues: accessibilitySettings.audioCues,
+      });
+    } catch (err) {
+      // Retained locally
+    }
     setTimeout(() => setSaved(false), 2000);
   };
 

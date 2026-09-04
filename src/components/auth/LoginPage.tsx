@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Phone, Lock, ArrowRight, Globe, Heart } from 'lucide-react';
 import { ActiveView, Language } from '../../types';
 import { NER_LANGUAGES } from '../../data/mockData';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface LoginPageProps {
   onNavigate: (view: ActiveView) => void;
@@ -14,19 +15,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   currentLanguage,
   onSelectLanguage,
 }) => {
+  const auth = useAuth();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     setIsLoading(true);
-    // Mock login — just navigate after brief delay
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await auth.login(phone.trim(), password);
       onNavigate('patient-app');
-    }, 800);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -156,6 +163,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 Forgot password?
               </button>
             </div>
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold text-center">
+                {errorMessage}
+              </div>
+            )}
 
             {/* Login Button */}
             <button
