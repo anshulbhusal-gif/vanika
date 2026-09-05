@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Heart, Volume2, Music, Moon, Coffee, Sparkles, Smile } from 'lucide-react';
+import { Volume2, Sparkles, Sun, Heart, Music, Coffee, Moon } from 'lucide-react';
 import { soundSynth } from '../../utils/audioSynth';
 import { VoiceAssistant } from '../../utils/speech';
 import { Language } from '../../types';
@@ -14,53 +14,53 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ currentLanguage }) => 
   const timelineSteps = [
     {
       time: '7:30 AM',
-      title: 'Good Morning Greeting',
-      tagline: 'Your day begins with a warm greeting and gentle reminder',
+      title: 'Morning Greeting',
+      tagline: 'A warm greeting and gentle morning routine prompt',
       symbol: '🌅',
       icon: Sun,
-      color: 'bg-[#D9A441]',
-      audioText: 'Good morning Raj! The sun is rising over the tea hills. Have a warm cup of red tea and take your green medicine tablet.',
-      description: 'The AI companion offers an affectionate greeting in Assamese or English, reminding the elder of morning tea and medications.'
+      color: 'bg-[#D4AF37]',
+      audioText: 'Good morning! The sun is rising over the tea hills. Have a warm cup of red tea and take your green tablet.',
+      description: 'The AI companion offers an affectionate morning greeting in your mother tongue, softly suggesting morning tea and medication.'
     },
     {
       time: '10:00 AM',
-      title: 'Memory Game in Courtyard',
-      tagline: "Let's recall some precious memories together",
+      title: 'Courtyard Memory',
+      tagline: "Let's recall precious moments together",
       symbol: '🖼️',
       icon: Heart,
-      color: 'bg-[#C87552]',
+      color: 'bg-[#C06A44]',
       audioText: 'Let us open our family photo album and remember our loved ones at the Bihu gathering.',
-      description: 'A 5-minute photo recall session ("Who is this?") keeping episodic memory pathways active without creating fatigue.'
+      description: 'A 5-minute photo recall activity keeping episodic memory pathways active without creating cognitive fatigue.'
     },
     {
       time: '2:00 PM',
-      title: 'Cultural Folklore & Sequence',
-      tagline: 'Enjoy familiar stories, music, and traditions',
+      title: 'Folklore & Sequence',
+      tagline: 'Familiar stories, music, and harvest rhythms',
       symbol: '🪘',
       icon: Music,
-      color: 'bg-[#7EA9A5]',
+      color: 'bg-[#7B9E87]',
       audioText: 'Time to arrange the Bihu morning harvest steps and hear the cheerful Pepa rhythm.',
-      description: 'Procedural sequencing puzzles around harvest rituals, tea plucking, and traditional handicrafts.'
+      description: 'Procedural sequencing puzzles structured around traditional harvest rituals, tea plucking, and handicrafts.'
     },
     {
       time: '5:00 PM',
-      title: 'Relax, Breathe & Tend Garden',
-      tagline: 'Take a calm break with soothing botanical growth',
+      title: 'Evening Rest & Garden',
+      tagline: 'A calm break with soothing garden growth',
       symbol: '🌿',
       icon: Coffee,
-      color: 'bg-[#315C4C]',
-      audioText: 'The evening lamps are ready. Let us take 3 deep gentle breaths and water the jasmine bush in our Memory Garden.',
-      description: 'Diaphragmatic breathing accompanied by bamboo water droplets and garden flower bloom visualizers.'
+      color: 'bg-[#3D5A4E]',
+      audioText: 'The evening lamps are lit. Let us take 3 deep gentle breaths and tend the jasmine in our Memory Garden.',
+      description: 'Gentle diaphragmatic breathing paired with peaceful bamboo water droplets and garden visualizers.'
     },
     {
       time: '8:00 PM',
-      title: 'Daily Reflection & Rest',
-      tagline: 'You did so well today. Rest peacefully.',
+      title: 'Night Reflection',
+      tagline: 'You did wonderfully today. Rest peacefully.',
       symbol: '🌙',
       icon: Moon,
-      color: 'bg-[#24483C]',
+      color: 'bg-[#1E3A2F]',
       audioText: 'You did so wonderfully today. May your sleep be sound and peaceful under the quiet hills.',
-      description: 'A quiet affirmation and gentle evening lullaby tone to prevent sundowning anxiety and promote deep rest.'
+      description: 'A quiet affirmation and peaceful evening audio tone to prevent sundowning anxiety and promote rest.'
     }
   ];
 
@@ -77,46 +77,46 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ currentLanguage }) => 
   const activeStep = timelineSteps[activeStepIndex];
 
   return (
-    <section className="py-12 sm:py-16 bg-[#FDFBF7]" id="section-timeline">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section-breathing bg-[#FDFBF7] dark:bg-[#0C1A11]" id="section-timeline">
+      <div className="section-max">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2D4739]/10 text-[#1E3A2F] text-xs font-bold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-            Daily Rhythm
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E3A2F]/10 dark:bg-[#D4AF37]/15 text-[#1E3A2F] dark:text-[#D4AF37] text-xs font-semibold uppercase tracking-widest mb-4">
+            <Sparkles className="w-3.5 h-3.5" />
+            DAILY RHYTHM & STRUCTURE
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-heading text-[#1E3A2F] tracking-tight">
-            A day with Vanika
+          <h2 className="font-display text-display-lg text-[#1A2F24] dark:text-[#F2EDE3]">
+            A day with Vanika.
           </h2>
-          <p className="mt-3 text-lg sm:text-xl text-[#52635D] leading-relaxed">
-            Gentle routines woven throughout the day, providing structure, emotional calm, and joyful moments of memory.
+          <p className="mt-4 prose-elder text-[#5A7265] dark:text-[#9DBFB0] leading-relaxed">
+            Gentle routines woven throughout the day, providing comforting structure, emotional calm, and joyful moments of memory.
           </p>
         </div>
 
-        {/* Interactive Timeline Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+        {/* Timeline Step Buttons */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
           {timelineSteps.map((step, idx) => {
             const isActive = activeStepIndex === idx;
             return (
               <button
                 key={step.time}
                 onClick={() => handleStepClick(idx)}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between shadow-2xs ${
+                className={`card-story p-5 text-left transition-all cursor-pointer flex flex-col justify-between ${
                   isActive
-                    ? 'bg-[#2D4739] text-[#FDFBF7] border-[#2D4739] shadow-sm scale-102 font-medium'
-                    : 'bg-white border-[#2D4739]/15 hover:border-[#2D4739]/40 text-[#2D4739]'
+                    ? 'bg-[#1E3A2F] text-[#FDFBF7] border-[#D4AF37] shadow-md ring-2 ring-[#D4AF37]/30'
+                    : 'bg-white dark:bg-[#162A1F] text-[#1A2F24] dark:text-[#F2EDE3] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`text-xs font-extrabold px-2 py-0.5 rounded-full ${
-                    isActive ? 'bg-[#D4AF37] text-[#1E3A2F]' : 'bg-[#F5EFE6] text-[#52635D]'
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`font-mono-label text-[10px] px-2 py-0.5 rounded-full ${
+                    isActive ? 'bg-[#D4AF37] text-[#1E3A2F] font-bold' : 'bg-[#F5EEE2] dark:bg-[#1A3328] text-[#5A7265] dark:text-[#9DBFB0]'
                   }`}>
                     {step.time}
                   </span>
                   <span className="text-xl">{step.symbol}</span>
                 </div>
-                <h4 className="font-heading font-bold text-sm sm:text-base leading-tight mt-1">
+                <h4 className="font-display text-lg font-bold leading-tight mt-1">
                   {step.title}
                 </h4>
               </button>
@@ -124,49 +124,49 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ currentLanguage }) => 
           })}
         </div>
 
-        {/* Selected Milestone Active Spotlight Card */}
-        <div className="bg-[#FFFFFF] border border-[#2D4739]/20 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-lg relative overflow-hidden">
+        {/* Active Step Showcase */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 sm:p-12 border border-[#2D4739]/15 dark:border-[#D4AF37]/25 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             
             <div className="md:col-span-4 text-center md:text-left flex flex-col items-center md:items-start">
-              <div className={`w-20 h-20 rounded-2xl ${activeStep.color} text-white flex items-center justify-center text-4xl shadow-sm mb-4`}>
+              <div className={`w-20 h-20 rounded-3xl ${activeStep.color} text-white flex items-center justify-center text-4xl shadow-md mb-4`}>
                 {activeStep.symbol}
               </div>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-[#C66B44]">
-                {activeStep.time} Daily Routine
+              <span className="font-mono-label text-xs text-[#C06A44] tracking-widest uppercase">
+                {activeStep.time} MOMENT
               </span>
-              <h3 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#1E3A2F] mt-1">
+              <h3 className="font-display text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mt-1">
                 {activeStep.title}
               </h3>
-              <p className="text-base text-[#52635D] mt-2 leading-relaxed">
+              <p className="text-sm text-[#5A7265] dark:text-[#9DBFB0] mt-2 leading-relaxed">
                 {activeStep.tagline}
               </p>
             </div>
 
-            <div className="md:col-span-8 bg-[#FDFBF7] p-6 rounded-2xl border border-[#2D4739]/15 space-y-4 shadow-2xs">
-              <span className="text-xs font-bold text-[#2D4739] uppercase tracking-wide block">
-                Spoken Voice Cue for Elder:
+            <div className="md:col-span-8 bg-[#FDFBF7] dark:bg-[#0F2219] p-7 rounded-3xl border border-[#2D4739]/10 dark:border-[#D4AF37]/20 space-y-5">
+              <span className="font-mono-label text-[11px] text-[#7B9E87] tracking-widest uppercase block">
+                SPOKEN VOICE CUE FOR ELDER:
               </span>
               
-              <blockquote className="text-base sm:text-lg text-[#2D4739] font-medium leading-relaxed italic bg-[#F5EFE6] p-4 rounded-xl border-l-4 border-[#2D4739]">
+              <blockquote className="text-base sm:text-lg text-[#1A2F24] dark:text-[#F2EDE3] font-medium leading-relaxed italic bg-[#F5EEE2] dark:bg-[#1A3328] p-5 rounded-2xl border-l-4 border-[#D4AF37]">
                 "{activeStep.audioText}"
               </blockquote>
 
-              <p className="text-xs sm:text-sm text-[#52635D] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#5A7265] dark:text-[#9DBFB0] leading-relaxed">
                 {activeStep.description}
               </p>
 
-              <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
+              <div className="pt-2 flex items-center justify-between flex-wrap gap-4">
                 <button
                   onClick={() => handleHearStep(activeStep.audioText)}
-                  className="py-3 px-5 rounded-xl bg-[#2D4739] hover:bg-[#1E3A2F] text-[#FDFBF7] font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                  className="btn-primary"
                 >
                   <Volume2 className="w-4 h-4 text-[#D4AF37]" />
-                  <span>🔊 Hear This Daily Routine Cue</span>
+                  <span>Hear Daily Routine Cue</span>
                 </button>
 
-                <div className="text-xs font-bold text-[#52635D]">
-                  Step {activeStepIndex + 1} of 5
+                <div className="font-mono-label text-xs text-[#5A7265] dark:text-[#9DBFB0]">
+                  STEP {activeStepIndex + 1} OF 5
                 </div>
               </div>
             </div>

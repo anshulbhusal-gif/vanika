@@ -16,17 +16,14 @@ export const GameResultScreen: React.FC<GameResultScreenProps> = ({
   const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
-    // Stagger the entrance animation
     setTimeout(() => setShowContent(true), 300);
 
-    // Animate score counting up
     const target = result.accuracy;
     const duration = 1200;
     const startTime = Date.now();
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setAnimatedScore(Math.round(target * eased));
       if (progress >= 1) clearInterval(timer);
@@ -42,31 +39,30 @@ export const GameResultScreen: React.FC<GameResultScreenProps> = ({
   };
 
   return (
-    <div className="py-8 sm:py-12 px-4 sm:px-6" id="view-game-result">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-10 sm:py-16" id="view-game-result">
+      <div className="section-max max-w-2xl mx-auto space-y-8">
 
         {/* Celebration Header */}
-        <div className={`text-center mb-10 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-[#D4AF37] to-[#E5C45B] flex items-center justify-center text-6xl shadow-lg mb-6 animate-companion-breathe">
+        <div className={`text-center space-y-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="w-24 h-24 mx-auto rounded-3xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-6xl shadow-md animate-companion-breathe">
             🎉
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold font-heading text-[#1E3A2F] mb-3">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] tracking-tight">
             Well Done!
           </h1>
-          <p className="text-lg text-[#52635D]">
-            You completed <strong className="text-[#1E3A2F]">{result.gameName}</strong> beautifully.
+          <p className="prose-elder text-[#5A7265] dark:text-[#9DBFB0]">
+            You completed <strong className="text-[#1A2F24] dark:text-[#F2EDE3]">{result.gameName}</strong> beautifully.
           </p>
         </div>
 
-        {/* Score Circle */}
-        <div className={`flex justify-center mb-10 transition-all duration-700 delay-200 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Accuracy Ring */}
+        <div className={`flex justify-center transition-all duration-700 delay-200 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="relative w-44 h-44">
-            {/* Background circle */}
             <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
-              <circle cx="80" cy="80" r="70" fill="none" stroke="#F5EFE6" strokeWidth="12" />
+              <circle cx="80" cy="80" r="70" fill="none" stroke="currentColor" className="text-[#2D4739]/10 dark:text-[#D4AF37]/15" strokeWidth="12" />
               <circle
                 cx="80" cy="80" r="70" fill="none"
-                stroke={animatedScore >= 80 ? '#2D4739' : animatedScore >= 60 ? '#D4AF37' : '#C66B44'}
+                stroke={animatedScore >= 80 ? '#1E3A2F' : animatedScore >= 60 ? '#D4AF37' : '#C06A44'}
                 strokeWidth="12"
                 strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 70}`}
@@ -75,108 +71,96 @@ export const GameResultScreen: React.FC<GameResultScreenProps> = ({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-extrabold text-[#1E3A2F]">{animatedScore}%</span>
-              <span className="text-sm font-bold text-[#6A9B96]">Accuracy</span>
+              <span className="font-display text-4xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{animatedScore}%</span>
+              <span className="font-mono-label text-[10px] text-[#7B9E87]">ACCURACY</span>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 transition-all duration-700 delay-300 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 text-center shadow-sm">
-            <Trophy className="w-6 h-6 text-[#D4AF37] mx-auto mb-2" />
-            <span className="block text-2xl font-extrabold text-[#1E3A2F]">{result.score}/{result.totalQuestions}</span>
-            <span className="block text-xs font-bold text-[#52635D]">Score</span>
+        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 transition-all duration-700 delay-300 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="card-story bg-white dark:bg-[#162A1F] p-4 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <Trophy className="w-5 h-5 text-[#D4AF37] mx-auto mb-1" />
+            <span className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{result.score}/{result.totalQuestions}</span>
+            <span className="font-mono-label text-[10px] text-[#7B9E87] block">SCORE</span>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 text-center shadow-sm">
-            <Target className="w-6 h-6 text-[#C66B44] mx-auto mb-2" />
-            <span className="block text-2xl font-extrabold text-[#1E3A2F]">{result.accuracy}%</span>
-            <span className="block text-xs font-bold text-[#52635D]">Accuracy</span>
+
+          <div className="card-story bg-white dark:bg-[#162A1F] p-4 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <Target className="w-5 h-5 text-[#C06A44] mx-auto mb-1" />
+            <span className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{result.accuracy}%</span>
+            <span className="font-mono-label text-[10px] text-[#7B9E87] block">ACCURACY</span>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 text-center shadow-sm">
-            <Clock className="w-6 h-6 text-[#6A9B96] mx-auto mb-2" />
-            <span className="block text-2xl font-extrabold text-[#1E3A2F]">{formatTime(result.timeSpent)}</span>
-            <span className="block text-xs font-bold text-[#52635D]">Time</span>
+
+          <div className="card-story bg-white dark:bg-[#162A1F] p-4 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <Clock className="w-5 h-5 text-[#7B9E87] mx-auto mb-1" />
+            <span className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{formatTime(result.timeSpent)}</span>
+            <span className="font-mono-label text-[10px] text-[#7B9E87] block">TIME</span>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 text-center shadow-sm">
-            <Star className="w-6 h-6 text-[#D4AF37] mx-auto mb-2" />
-            <span className="block text-2xl font-extrabold text-[#1E3A2F]">{result.difficulty}</span>
-            <span className="block text-xs font-bold text-[#52635D]">Difficulty</span>
+
+          <div className="card-story bg-white dark:bg-[#162A1F] p-4 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <Star className="w-5 h-5 text-[#D4AF37] mx-auto mb-1" />
+            <span className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{result.difficulty}</span>
+            <span className="font-mono-label text-[10px] text-[#7B9E87] block">DIFFICULTY</span>
           </div>
         </div>
 
-        {/* What You Did Well */}
-        <div className={`bg-emerald-50 rounded-3xl p-6 border border-emerald-200 mb-6 transition-all duration-700 delay-400 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className="w-5 h-5 text-emerald-600" />
-            <h3 className="text-lg font-extrabold text-emerald-900">What You Did Well</h3>
+        {/* Strengths */}
+        <div className={`card-story bg-[#7B9E87]/15 p-6 border border-[#7B9E87] transition-all duration-700 delay-400 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="flex items-center gap-2 mb-3">
+            <Heart className="w-5 h-5 text-[#7B9E87]" />
+            <h3 className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3]">What You Did Well</h3>
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {result.strengths.map((strength, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-emerald-800 font-semibold">
-                <span className="text-emerald-500 mt-0.5">✓</span>
-                {strength}
+              <li key={i} className="flex items-start gap-2 text-xs font-semibold text-[#5A7265] dark:text-[#9DBFB0]">
+                <span className="text-[#7B9E87] font-bold">✓</span>
+                <span>{strength}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Improvements */}
-        {result.improvements.length > 0 && (
-          <div className={`bg-[#D4AF37]/10 rounded-3xl p-6 border border-[#D4AF37]/30 mb-8 transition-all duration-700 delay-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
-              <h3 className="text-lg font-extrabold text-[#1E3A2F]">Your Improvement</h3>
-            </div>
-            <ul className="space-y-2">
-              {result.improvements.map((improvement, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-[#2D4739] font-semibold">
-                  <span className="text-[#D4AF37] mt-0.5">↑</span>
-                  {improvement}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {/* Next Recommendation */}
-        <div className={`transition-all duration-700 delay-600 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h3 className="text-lg font-extrabold text-[#1E3A2F] mb-3 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#D4AF37]" />
+        <div className={`transition-all duration-700 delay-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h3 className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#D4AF37]" />
             Next Recommended Activity
           </h3>
           <button
             onClick={() => onNavigate(result.nextRecommendation.view)}
-            className="card-lift w-full flex items-center gap-4 p-5 rounded-2xl bg-white border-2 border-[#2D4739]/10 shadow-sm cursor-pointer text-left hover:border-[#D4AF37] transition-all focus-accessible group"
+            className="card-story w-full p-5 bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 dark:border-[#D4AF37]/20 flex items-center justify-between cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-2xl bg-[#6A9B96]/15 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-              {result.nextRecommendation.icon}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                {result.nextRecommendation.icon}
+              </div>
+              <div className="text-left">
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">{result.nextRecommendation.name}</span>
+                <span className="font-mono-label text-[10px] text-[#7B9E87]">{result.nextRecommendation.category}</span>
+              </div>
             </div>
-            <div className="flex-1">
-              <span className="block text-base font-extrabold text-[#1E3A2F]">{result.nextRecommendation.name}</span>
-              <span className="block text-xs font-bold text-[#6A9B96]">{result.nextRecommendation.category}</span>
-            </div>
-            <ArrowRight className="w-5 h-5 text-[#D4AF37] shrink-0 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-5 h-5 text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
         {/* Action Buttons */}
-        <div className={`mt-8 flex flex-col sm:flex-row gap-3 transition-all duration-700 delay-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`flex flex-col sm:flex-row gap-4 pt-4 transition-all duration-700 delay-600 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <button
             onClick={() => onNavigate(result.nextRecommendation.view)}
-            className="flex-1 py-4 rounded-2xl bg-[#1E3A2F] hover:bg-[#2D4739] text-[#FDFBF7] font-extrabold text-base flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer focus-accessible"
+            className="btn-primary flex-1 py-4 text-base"
           >
-            Continue
-            <ArrowRight className="w-5 h-5" />
+            <span>Continue Journey</span>
+            <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
           </button>
           <button
             onClick={() => onNavigate('patient-app')}
-            className="flex-1 py-4 rounded-2xl bg-white border-2 border-[#2D4739]/15 text-[#1E3A2F] font-bold text-base flex items-center justify-center gap-2 hover:border-[#D4AF37] transition-all cursor-pointer focus-accessible"
+            className="btn-ghost flex-1 py-4 text-base"
           >
-            <Home className="w-5 h-5" />
-            Back to Dashboard
+            <Home className="w-4 h-4" />
+            <span>Return to Courtyard</span>
           </button>
         </div>
+
       </div>
     </div>
   );

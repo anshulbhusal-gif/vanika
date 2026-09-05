@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Sparkles, Heart, RefreshCw, CheckCircle2, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import { Volume2, Heart, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { VoiceAssistant } from '../../utils/speech';
 import { speechEngine } from '../../utils/speech';
 import { soundSynth } from '../../utils/audioSynth';
@@ -43,14 +43,13 @@ export const MemoryGame: React.FC<MemoryGameProps> = ({ currentLanguage, onBackT
       setScore(newScore);
       soundSynth.playCelebration();
 
-      // Record cognitive score to local vault
       vanikaStorage.recordGameSession('memory', Math.min(100, 75 + newScore * 10), 4);
 
       confetti({
         particleCount: 50,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#315C4C', '#D9A441', '#C87552']
+        colors: ['#1E3A2F', '#D4AF37', '#C06A44']
       });
 
       speechEngine.speak(`Well remembered! That is ${currentItem.correctAnswer}.`, {
@@ -119,199 +118,202 @@ export const MemoryGame: React.FC<MemoryGameProps> = ({ currentLanguage, onBackT
     );
   };
 
-
   if (!currentItem) {
     return (
-      <div className="max-w-4xl mx-auto py-12 text-center text-[#24483C]">
-        <p className="text-xl font-bold">Loading family memory photos...</p>
+      <div className="section-max py-20 text-center text-[#1A2F24] dark:text-[#F2EDE3]">
+        <p className="font-display text-2xl font-bold">Loading family memory photos...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6" id="view-game-memory">
-      {/* Top Bar with Return & Title */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#315C4C]/15">
-        <div className="flex items-center gap-3">
-          {onBackToApp && (
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-game-memory">
+      <div className="section-max max-w-4xl mx-auto space-y-8">
+        
+        {/* Header Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <div className="flex items-center gap-4">
+            {onBackToApp && (
+              <button
+                onClick={() => {
+                  soundSynth.playSoftClick();
+                  onBackToApp();
+                }}
+                className="w-10 h-10 rounded-xl bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 dark:border-[#D4AF37]/25 text-[#1A2F24] dark:text-[#F2EDE3] flex items-center justify-center cursor-pointer hover:border-[#D4AF37]"
+                title="Return to Courtyard"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🖼️</span>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                  Who is in this memory?
+                </h2>
+              </div>
+              <p className="font-mono-label text-xs text-[#7B9E87] mt-0.5">
+                LIFE-STORY RECALL • PHOTO {currentIndex + 1} OF {photos.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleVoiceAnswer}
+              className={`py-2 px-4 rounded-full text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer ${
+                isListening
+                  ? 'bg-[#C06A44] text-white border-[#C06A44] animate-pulse'
+                  : 'bg-white dark:bg-[#162A1F] text-[#1A2F24] dark:text-[#F2EDE3] border-[#2D4739]/15 dark:border-[#D4AF37]/25 hover:border-[#D4AF37]'
+              }`}
+            >
+              <span>🎙️</span>
+              <span>{isListening ? 'Listening...' : 'Voice Answer'}</span>
+            </button>
+
+            <div className="bg-[#1E3A2F] text-[#D4AF37] px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
+              <Heart className="w-4 h-4 fill-current" />
+              <span>Score: {score}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Memory Album Frame */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 sm:p-10 border border-[#2D4739]/15 dark:border-[#D4AF37]/25 shadow-xl">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            {/* Photograph Container */}
+            <div className="md:col-span-6">
+              <div className="p-3 rounded-2xl bg-[#F5EEE2] dark:bg-[#1A3328] border border-[#2D4739]/15 dark:border-[#D4AF37]/20 shadow-md">
+                <SafeImage
+                  src={currentItem.imageUrl}
+                  alt={currentItem.title}
+                  className="w-full h-64 sm:h-80 rounded-xl"
+                />
+
+                <div className="mt-3 flex items-center justify-between font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] px-1">
+                  <span>📍 {currentItem.location}</span>
+                  <span>🗓️ {currentItem.year}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Prompt & Voice Audio */}
+            <div className="md:col-span-6 space-y-5">
+              <div className="card-story bg-[#FDFBF7] dark:bg-[#0F2219] p-6 border border-[#2D4739]/10 dark:border-[#D4AF37]/20 space-y-3">
+                <span className="font-mono-label text-[10px] text-[#C06A44] uppercase tracking-widest block">
+                  FAMILY ALBUM MEMORY
+                </span>
+                <h3 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                  {currentItem.title}
+                </h3>
+                <p className="prose-elder text-[#5A7265] dark:text-[#9DBFB0] text-sm leading-relaxed italic">
+                  "{currentItem.audioPrompt}"
+                </p>
+
+                <button
+                  onClick={handlePlayVoicePrompt}
+                  className="btn-primary w-full py-3 text-xs"
+                >
+                  <Volume2 className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Hear Question Spoken</span>
+                </button>
+              </div>
+
+              {/* Feedback Banners */}
+              {isCorrect === true && (
+                <div className="p-5 rounded-2xl bg-[#7B9E87]/15 border border-[#7B9E87] text-[#1A2F24] dark:text-[#F2EDE3] animate-slide-up space-y-1">
+                  <div className="flex items-center gap-2 font-display text-lg font-bold">
+                    <CheckCircle2 className="w-5 h-5 text-[#7B9E87]" />
+                    <span>Well remembered!</span>
+                  </div>
+                  <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] leading-relaxed">
+                    {currentItem.storyNote}
+                  </p>
+                </div>
+              )}
+
+              {isCorrect === false && (
+                <div className="p-5 rounded-2xl bg-[#C06A44]/15 border border-[#C06A44] text-[#1A2F24] dark:text-[#F2EDE3] animate-slide-up space-y-1">
+                  <div className="flex items-center gap-2 font-display text-lg font-bold">
+                    <Heart className="w-5 h-5 text-[#C06A44]" />
+                    <span>Let's look once more.</span>
+                  </div>
+                  <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">
+                    Take a calm breath. Look at the smile and the backdrop.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 4 Touch Target Options */}
+          <div className="mt-10 pt-8 border-t border-[#2D4739]/10 dark:border-[#D4AF37]/15">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+              <label className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                Select the person in this memory:
+              </label>
+              <GameVoiceAnswerButton
+                options={currentItem.options}
+                onOptionMatched={(matchedOption) => handleSelectOption(matchedOption)}
+                currentLanguage={currentLanguage}
+                promptMessage="Speak the name of the person in the photo"
+                disabled={selectedAnswer !== null && isCorrect === true}
+                label="Speak Answer"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {currentItem.options.map((option) => {
+                const isSelected = selectedAnswer === option;
+                const isRightAnswer = option === currentItem.correctAnswer;
+                
+                let btnStyle = 'bg-[#FDFBF7] dark:bg-[#0F2219] text-[#1A2F24] dark:text-[#F2EDE3] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]';
+                if (isSelected) {
+                  if (isRightAnswer) {
+                    btnStyle = 'bg-[#1E3A2F] text-white border-[#D4AF37] font-bold shadow-md';
+                  } else {
+                    btnStyle = 'bg-[#C06A44]/15 text-[#C06A44] border-[#C06A44] font-bold';
+                  }
+                }
+
+                return (
+                  <button
+                    key={option}
+                    onClick={() => handleSelectOption(option)}
+                    className={`btn-elder py-4 px-6 rounded-2xl border transition-all cursor-pointer flex items-center justify-between text-left ${btnStyle}`}
+                  >
+                    <span>{option}</span>
+                    {isSelected && isRightAnswer && <CheckCircle2 className="w-5 h-5 text-[#D4AF37]" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action Footer */}
+          <div className="mt-10 pt-6 border-t border-[#2D4739]/10 dark:border-[#D4AF37]/15 flex items-center justify-between flex-wrap gap-4">
             <button
               onClick={() => {
                 soundSynth.playSoftClick();
-                onBackToApp();
+                setSelectedAnswer(null);
+                setIsCorrect(null);
               }}
-              className="p-2.5 rounded-xl bg-[#EDE5D2] text-[#24483C] hover:bg-[#315C4C] hover:text-[#F8F4EA] transition-colors cursor-pointer"
-              title="Return to Courtyard"
+              className="btn-ghost py-3 px-5 text-xs font-semibold"
             >
-              <ArrowLeft className="w-5 h-5" />
+              Try Again
             </button>
-          )}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🖼️</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#24483C]">
-                Who is this?
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-[#4A5B55]">
-              Life-Story Memory Recall • Photo {currentIndex + 1} of {photos.length}
-            </p>
+
+            <button
+              onClick={handleNextPhoto}
+              className="btn-primary py-3.5 px-6"
+            >
+              <span>Next Memory</span>
+              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+            </button>
           </div>
         </div>
 
-        {/* Peaceful Progress Pill & Voice Answer */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleVoiceAnswer}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border ${
-              isListening
-                ? 'bg-rose-100 text-rose-800 border-rose-300 animate-pulse'
-                : 'bg-[#EDE5D2] text-[#24483C] border-[#315C4C]/30 hover:bg-[#315C4C] hover:text-[#F8F4EA]'
-            }`}
-          >
-            <span>🎙️</span>
-            <span>{isListening ? 'Listening...' : 'Voice Answer'}</span>
-          </button>
-
-          <div className="bg-[#315C4C]/10 border border-[#315C4C]/25 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-[#24483C] flex items-center gap-1.5">
-            <Heart className="w-4 h-4 text-[#C87552] fill-current" />
-            <span>Memories Recalled: {score}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Memory Album Frame */}
-      <div className="bg-[#FDFBF7] border-3 border-[#315C4C] rounded-3xl p-6 sm:p-8 shadow-xl text-[#24332E]">
-        {/* Photo & Story Context Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-          {/* Photograph Container */}
-          <div className="md:col-span-6 relative">
-            <div className="bg-white p-3.5 rounded-2xl shadow-md border-2 border-[#EDE5D2] relative overflow-hidden group">
-              <SafeImage
-                src={currentItem.imageUrl}
-                alt={currentItem.title}
-                className="w-full h-64 sm:h-80 rounded-xl"
-              />
-
-              <div className="mt-2.5 flex items-center justify-between text-xs text-[#4A5B55] px-1 font-semibold">
-                <span>📍 {currentItem.location}</span>
-                <span>🗓️ {currentItem.year}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Prompt & Voice Audio */}
-          <div className="md:col-span-6 space-y-4">
-            <div className="bg-[#F8F4EA] p-5 rounded-2xl border border-[#315C4C]/20 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C87552]">
-                Family Album Memory
-              </span>
-              <h3 className="font-heading font-extrabold text-xl sm:text-2xl text-[#24483C]">
-                {currentItem.title}
-              </h3>
-              <p className="text-base sm:text-lg text-[#4A5B55] leading-relaxed">
-                "{currentItem.audioPrompt}"
-              </p>
-
-              <button
-                onClick={handlePlayVoicePrompt}
-                className="w-full py-3 px-4 rounded-xl bg-[#315C4C] hover:bg-[#24483C] text-[#F8F4EA] font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-              >
-                <Volume2 className="w-4 h-4 text-[#D9A441]" />
-                <span>🔊 Hear Question Spoken Aloud</span>
-              </button>
-            </div>
-
-            {/* Feedback Banners */}
-            {isCorrect === true && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-400 text-emerald-900 animate-fadeIn space-y-1">
-                <div className="flex items-center gap-2 font-bold text-base sm:text-lg">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
-                  <span>Well remembered!</span>
-                </div>
-                <p className="text-sm text-emerald-800 leading-relaxed">
-                  {currentItem.storyNote}
-                </p>
-              </div>
-            )}
-
-            {isCorrect === false && (
-              <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 animate-fadeIn space-y-1">
-                <div className="flex items-center gap-2 font-bold text-base">
-                  <Heart className="w-5 h-5 text-[#C87552]" />
-                  <span>Let's look once more.</span>
-                </div>
-                <p className="text-xs sm:text-sm text-amber-800">
-                  Take a calm breath. Look at the smile and the {currentItem.location} backdrop.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 4 Large Touch Target Options */}
-        <div className="mt-8 pt-6 border-t border-[#315C4C]/15">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-            <label className="text-sm sm:text-base font-bold text-[#24483C]">
-              Select the person in this memory:
-            </label>
-            <GameVoiceAnswerButton
-              options={currentItem.options}
-              onOptionMatched={(matchedOption) => handleSelectOption(matchedOption)}
-              currentLanguage={currentLanguage}
-              promptMessage="Speak the name of the person in the photo"
-              disabled={selectedAnswer !== null && isCorrect === true}
-              label="Speak Answer"
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {currentItem.options.map((option) => {
-              const isSelected = selectedAnswer === option;
-              const isRightAnswer = option === currentItem.correctAnswer;
-              
-              let btnClass = 'bg-[#F8F4EA] hover:bg-[#EDE5D2] text-[#24483C] border-[#315C4C]/20';
-              if (isSelected) {
-                if (isRightAnswer) {
-                  btnClass = 'bg-emerald-600 text-white border-emerald-700 font-extrabold shadow-md';
-                } else {
-                  btnClass = 'bg-amber-100 text-amber-900 border-amber-400 font-bold';
-                }
-              }
-
-              return (
-                <button
-                  key={option}
-                  onClick={() => handleSelectOption(option)}
-                  className={`py-4 px-5 rounded-2xl text-base sm:text-lg font-bold border-2 transition-all cursor-pointer flex items-center justify-between text-left shadow-xs focus-accessible ${btnClass}`}
-                >
-                  <span>{option}</span>
-                  {isSelected && isRightAnswer && <CheckCircle2 className="w-5 h-5 text-white" />}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Action Controls */}
-        <div className="mt-8 flex justify-between items-center flex-wrap gap-4 pt-4 border-t border-[#315C4C]/10">
-          <button
-            onClick={() => {
-              soundSynth.playSoftClick();
-              setSelectedAnswer(null);
-              setIsCorrect(null);
-            }}
-            className="px-4 py-2.5 rounded-xl bg-white border border-[#315C4C]/30 text-[#4A5B55] text-sm font-semibold hover:bg-[#EDE5D2] transition-colors cursor-pointer"
-          >
-            Try Again
-          </button>
-
-          <button
-            onClick={handleNextPhoto}
-            className="px-6 py-3 rounded-xl bg-[#315C4C] hover:bg-[#24483C] text-[#F8F4EA] font-bold text-base flex items-center gap-2 shadow-sm transition-colors cursor-pointer focus-accessible"
-          >
-            <span>Next Memory</span>
-            <ArrowRight className="w-5 h-5 text-[#D9A441]" />
-          </button>
-        </div>
       </div>
     </div>
   );

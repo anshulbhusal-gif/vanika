@@ -208,7 +208,7 @@ function AppContent() {
             onOpenProfile={() => setIsProfileOpen(true)}
             isAuthenticated={auth.isAuthenticated}
           />
-          <main className="flex-1">
+          <main key={activeView} className="flex-1 animate-3d-section-enter perspective-1200">
             {activeView === 'home' && (
               <div>
                 <HeroSection
@@ -299,8 +299,8 @@ function AppContent() {
               onOpenCompanion={() => setIsCompanionOpen(true)}
             />
 
-            {/* Main Content Area */}
-            <main className="flex-1 min-h-screen pb-20 lg:pb-0">
+            {/* Main Content Area with 3D Perspective Section Transition */}
+            <main key={activeView} className="flex-1 min-h-screen pb-20 lg:pb-0 animate-3d-section-enter perspective-1200">
               {activeView === 'patient-app' && (
                 <PatientAppView
                   currentLanguage={currentLanguage}

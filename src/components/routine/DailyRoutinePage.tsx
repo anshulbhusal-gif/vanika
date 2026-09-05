@@ -95,7 +95,6 @@ export const DailyRoutinePage: React.FC = () => {
         icon: newIcon,
       });
       if (created && created.id) {
-        // Update local temp id with backend id
         setTasks(prev => prev.map(t => t.id === newTask.id ? { ...t, id: created.id } : t));
       }
     } catch (err) {
@@ -156,69 +155,71 @@ export const DailyRoutinePage: React.FC = () => {
     label: string,
     icon: React.ReactNode,
     periodTasks: RoutineTask[],
-    colorClass: string,
   ) => (
-    <div className="mb-8">
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`w-10 h-10 rounded-xl ${colorClass} flex items-center justify-center`}>
-          {icon}
+    <div className="mb-10">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-[#1E3A2F] text-[#D4AF37] flex items-center justify-center">
+            {icon}
+          </div>
+          <h2 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">{label}</h2>
         </div>
-        <h2 className="text-xl font-extrabold font-heading text-[#1E3A2F]">{label}</h2>
-        <span className="text-xs font-bold text-[#52635D] bg-[#F5EFE6] px-2 py-1 rounded-full">
-          {periodTasks.filter(t => t.completed).length}/{periodTasks.length}
+        <span className="font-mono-label text-xs text-[#7B9E87]">
+          {periodTasks.filter(t => t.completed).length}/{periodTasks.length} COMPLETED
         </span>
       </div>
-      <div className="space-y-3">
+
+      <div className="space-y-4">
         {periodTasks.map((task) => (
           <div
             key={task.id}
-            className={`flex items-center gap-4 bg-white rounded-2xl p-4 sm:p-5 border transition-all ${
+            className={`card-story p-5 flex items-center gap-4 transition-all ${
               task.completed
-                ? 'border-emerald-200 bg-emerald-50/50'
-                : 'border-[#2D4739]/10 shadow-sm'
+                ? 'bg-[#7B9E87]/10 border-[#7B9E87]'
+                : 'bg-white dark:bg-[#162A1F] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
             }`}
           >
-            {/* Completion Checkbox */}
+            {/* Completion Button — Large Touch Target (min 52px) */}
             <button
               onClick={() => toggleCompleted(task.id)}
-              className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center shrink-0 cursor-pointer transition-all ${
+              className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center shrink-0 cursor-pointer transition-all ${
                 task.completed
-                  ? 'bg-emerald-500 border-emerald-500 text-white'
-                  : 'border-[#2D4739]/25 hover:border-[#D4AF37] text-transparent hover:text-[#D4AF37]'
+                  ? 'bg-[#1E3A2F] border-[#D4AF37] text-[#D4AF37] shadow-md'
+                  : 'bg-[#FDFBF7] dark:bg-[#0F2219] border-[#2D4739]/20 dark:border-[#D4AF37]/30 text-transparent hover:border-[#D4AF37]'
               }`}
               aria-label={task.completed ? 'Mark as incomplete' : 'Mark as completed'}
             >
-              <Check className="w-6 h-6" />
+              <Check className="w-7 h-7 stroke-[3]" />
             </button>
 
             {/* Icon */}
-            <span className="text-2xl shrink-0">{task.icon}</span>
+            <span className="text-3xl shrink-0">{task.icon}</span>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <span className={`block text-base font-bold ${
-                task.completed ? 'text-[#52635D] line-through' : 'text-[#1E3A2F]'
+              <span className={`block font-display text-lg font-bold ${
+                task.completed ? 'text-[#5A7265] dark:text-[#9DBFB0] line-through' : 'text-[#1A2F24] dark:text-[#F2EDE3]'
               }`}>
                 {task.title}
               </span>
-              <span className="flex items-center gap-1 text-xs font-semibold text-[#6A9B96] mt-0.5">
-                <Clock className="w-3 h-3" />
+              <span className="flex items-center gap-1.5 font-mono-label text-xs text-[#7B9E87] mt-1">
+                <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
                 {task.time}
               </span>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => startEdit(task)}
-                className="p-2 rounded-xl hover:bg-[#F5EFE6] text-[#52635D] hover:text-[#1E3A2F] cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-xl hover:bg-[#F5EEE2] dark:hover:bg-[#1A3328] text-[#5A7265] dark:text-[#9DBFB0] flex items-center justify-center cursor-pointer transition-colors"
                 aria-label="Edit task"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => deleteTask(task.id)}
-                className="p-2 rounded-xl hover:bg-rose-50 text-[#52635D] hover:text-rose-500 cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-xl hover:bg-[#C06A44]/15 text-[#C06A44] flex items-center justify-center cursor-pointer transition-colors"
                 aria-label="Delete task"
               >
                 <Trash2 className="w-4 h-4" />
@@ -227,115 +228,118 @@ export const DailyRoutinePage: React.FC = () => {
           </div>
         ))}
         {periodTasks.length === 0 && (
-          <p className="text-sm text-[#52635D] text-center py-4 font-semibold">
-            No tasks yet. Tap the + button to add one.
-          </p>
+          <div className="card-story bg-white dark:bg-[#162A1F] p-6 text-center border border-[#2D4739]/10">
+            <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">
+              No tasks scheduled for this period. Tap "+ Add Task" above.
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 
   return (
-    <div className="py-6 sm:py-10 px-4 sm:px-6" id="view-daily-routine">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-daily-routine">
+      <div className="section-max max-w-3xl mx-auto space-y-8">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/15 flex items-center justify-center">
-              <span className="text-2xl">📋</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] flex items-center justify-center text-xl">
+              📋
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#1E3A2F]">
+              <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] tracking-tight">
                 Daily Routine
               </h1>
-              <p className="text-sm text-[#52635D]">
-                {completedCount} of {tasks.length} completed today
+              <p className="text-sm text-[#5A7265] dark:text-[#9DBFB0] mt-0.5">
+                {completedCount} of {tasks.length} routine moments completed today
               </p>
             </div>
           </div>
 
           <button
             onClick={() => { resetForm(); setShowAddModal(true); }}
-            className="flex items-center gap-2 py-3 px-5 rounded-2xl bg-[#1E3A2F] hover:bg-[#2D4739] text-[#FDFBF7] font-bold text-sm shadow-md transition-all cursor-pointer focus-accessible"
+            className="btn-primary py-3 px-5 text-xs"
             id="btn-add-routine"
           >
-            <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">Add Task</span>
+            <Plus className="w-4 h-4 text-[#D4AF37]" />
+            <span>Add Task</span>
           </button>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="w-full h-4 rounded-full bg-[#F5EFE6] overflow-hidden">
+        {/* Routine Progress Bar */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-6 border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <div className="w-full h-3 rounded-full bg-[#F5EEE2] dark:bg-[#1A3328] overflow-hidden mb-3">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#2D4739] to-[#D4AF37] transition-all duration-500"
+              className="h-full rounded-full bg-[#D4AF37] transition-all duration-500"
               style={{ width: `${tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0}%` }}
             />
           </div>
-          <p className="text-xs font-bold text-[#6A9B96] mt-2 text-center">
+          <p className="text-xs font-semibold text-[#7B9E87] text-center">
             {completedCount === tasks.length && tasks.length > 0
-              ? '🎉 All tasks completed! Wonderful job today!'
-              : `${tasks.length - completedCount} tasks remaining — you are doing great!`}
+              ? '🎉 All routine moments completed! Wonderful job today!'
+              : `${tasks.length - completedCount} tasks remaining — taking one gentle step at a time!`}
           </p>
         </div>
 
         {/* Periods */}
-        {renderPeriod('Morning', <Sun className="w-5 h-5 text-amber-500" />, morningTasks, 'bg-amber-100')}
-        {renderPeriod('Afternoon', <Cloud className="w-5 h-5 text-[#6A9B96]" />, afternoonTasks, 'bg-[#6A9B96]/15')}
-        {renderPeriod('Evening', <Moon className="w-5 h-5 text-indigo-400" />, eveningTasks, 'bg-indigo-100')}
+        {renderPeriod('Morning Routine', <Sun className="w-5 h-5 text-[#D4AF37]" />, morningTasks)}
+        {renderPeriod('Afternoon Routine', <Cloud className="w-5 h-5 text-[#7B9E87]" />, afternoonTasks)}
+        {renderPeriod('Evening Routine', <Moon className="w-5 h-5 text-[#D4AF37]" />, eveningTasks)}
       </div>
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl bg-[#FDFBF7] p-6 sm:p-8 shadow-2xl border border-[#2D4739]/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-slide-up">
+          <div className="card-story w-full max-w-md bg-white dark:bg-[#162A1F] p-8 border border-[#D4AF37]/30 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-extrabold text-[#1E3A2F]">
-                {editingTask ? 'Edit Task' : 'Add New Task'}
+              <h3 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                {editingTask ? 'Edit Routine Task' : 'Add Routine Task'}
               </h3>
               <button
                 onClick={resetForm}
-                className="p-2 rounded-xl hover:bg-[#F5EFE6] cursor-pointer"
+                className="w-8 h-8 rounded-full bg-[#F5EEE2] dark:bg-[#1A3328] flex items-center justify-center cursor-pointer"
               >
-                <X className="w-5 h-5 text-[#52635D]" />
+                <X className="w-4 h-4 text-[#5A7265]" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-[#1E3A2F] mb-2">Task Name</label>
+                <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">Task Title</label>
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g., Morning walk"
-                  className="w-full py-4 px-4 rounded-2xl bg-white border-2 border-[#2D4739]/15 text-base font-semibold text-[#1E3A2F] placeholder-[#52635D]/40 focus:outline-none focus:border-[#D4AF37] transition-all"
+                  placeholder="e.g., Morning Red Tea (Lal Saah)"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/20 dark:border-[#D4AF37]/30 text-[#1A2F24] dark:text-[#F2EDE3] focus:outline-none focus:border-[#D4AF37]"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-[#1E3A2F] mb-2">Time</label>
+                <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">Time</label>
                 <input
                   type="text"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  placeholder="e.g., 8:00 AM"
-                  className="w-full py-4 px-4 rounded-2xl bg-white border-2 border-[#2D4739]/15 text-base font-semibold text-[#1E3A2F] placeholder-[#52635D]/40 focus:outline-none focus:border-[#D4AF37] transition-all"
+                  placeholder="e.g., 7:30 AM"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/20 dark:border-[#D4AF37]/30 text-[#1A2F24] dark:text-[#F2EDE3] focus:outline-none focus:border-[#D4AF37]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-[#1E3A2F] mb-2">Time of Day</label>
+                <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">Time of Day</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['morning', 'afternoon', 'evening'] as const).map((p) => (
                     <button
                       key={p}
                       onClick={() => setNewPeriod(p)}
-                      className={`py-3 px-3 rounded-xl font-bold text-sm capitalize cursor-pointer border-2 transition-all ${
+                      className={`py-3 px-2 rounded-xl text-xs font-bold capitalize cursor-pointer border transition-all ${
                         newPeriod === p
-                          ? 'bg-[#2D4739] text-[#FDFBF7] border-[#2D4739]'
-                          : 'bg-white text-[#52635D] border-[#2D4739]/15 hover:border-[#D4AF37]'
+                          ? 'bg-[#1E3A2F] text-[#D4AF37] border-[#D4AF37]'
+                          : 'bg-[#FDFBF7] dark:bg-[#0F2219] text-[#5A7265] border-[#2D4739]/15'
                       }`}
                     >
                       {p}
@@ -345,16 +349,16 @@ export const DailyRoutinePage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-[#1E3A2F] mb-2">Icon</label>
+                <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">Icon</label>
                 <div className="flex flex-wrap gap-2">
                   {ICON_OPTIONS.map((icon) => (
                     <button
                       key={icon}
                       onClick={() => setNewIcon(icon)}
-                      className={`w-11 h-11 rounded-xl text-xl flex items-center justify-center cursor-pointer border-2 transition-all ${
+                      className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center cursor-pointer border transition-all ${
                         newIcon === icon
                           ? 'bg-[#D4AF37]/20 border-[#D4AF37]'
-                          : 'bg-white border-[#2D4739]/10 hover:border-[#D4AF37]'
+                          : 'bg-[#FDFBF7] dark:bg-[#0F2219] border-[#2D4739]/15'
                       }`}
                     >
                       {icon}
@@ -364,19 +368,19 @@ export const DailyRoutinePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-3 mt-8">
               <button
                 onClick={resetForm}
-                className="flex-1 py-3 rounded-2xl bg-white border-2 border-[#2D4739]/15 text-[#52635D] font-bold cursor-pointer hover:bg-[#F5EFE6] transition-all"
+                className="btn-ghost flex-1 py-3 text-xs"
               >
                 Cancel
               </button>
               <button
                 onClick={editingTask ? handleEditSave : handleAddTask}
-                className="flex-1 py-3 rounded-2xl bg-[#1E3A2F] text-[#FDFBF7] font-extrabold flex items-center justify-center gap-2 shadow-md cursor-pointer hover:bg-[#2D4739] transition-all focus-accessible"
+                className="btn-primary flex-1 py-3 text-xs"
               >
-                <Save className="w-4 h-4" />
-                {editingTask ? 'Save Changes' : 'Add Task'}
+                <Save className="w-4 h-4 text-[#D4AF37]" />
+                <span>{editingTask ? 'Save Changes' : 'Add Task'}</span>
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowUp, ArrowDown, Sparkles, CheckCircle2, RotateCcw, Volume2, Music, Sun, Coffee } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowDown, Sparkles, CheckCircle2, RotateCcw } from 'lucide-react';
 import { BIHU_SEQUENCE_STEPS, TEA_PLUCKING_SEQUENCE_STEPS } from '../../data/culturalContent';
 import { SequenceStep, Language } from '../../types';
 import { soundSynth } from '../../utils/audioSynth';
@@ -13,7 +13,6 @@ interface SequenceGameProps {
   onBackToApp?: () => void;
 }
 
-// Fisher-Yates Shuffle Algorithm for Uniform Unbiased Randomization
 function fisherYatesShuffle<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -25,10 +24,7 @@ function fisherYatesShuffle<T>(array: T[]): T[] {
 
 export const SequenceGame: React.FC<SequenceGameProps> = ({ currentLanguage, onBackToApp }) => {
   const [selectedTheme, setSelectedTheme] = useState<'bihu' | 'tea'>('bihu');
-  const [isListening, setIsListening] = useState(false);
 
-  
-  // Scramble initial steps using Fisher-Yates shuffle
   const initialSteps = selectedTheme === 'bihu' ? BIHU_SEQUENCE_STEPS : TEA_PLUCKING_SEQUENCE_STEPS;
   const [steps, setSteps] = useState<SequenceStep[]>(() => {
     return fisherYatesShuffle(initialSteps);
@@ -66,15 +62,13 @@ export const SequenceGame: React.FC<SequenceGameProps> = ({ currentLanguage, onB
       soundSynth.playCelebration();
       setIsCompleted(true);
       setCheckedStatus(true);
-
-      // Record sequence cognitive score in local storage vault
       vanikaStorage.recordGameSession('sequence', 92, 5);
 
       confetti({
         particleCount: 50,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#D9A441', '#315C4C', '#C87552']
+        colors: ['#D4AF37', '#1E3A2F', '#C06A44']
       });
       speechEngine.speak('Auspicious harmony! You have arranged the festival ritual in perfect order.', { language: currentLanguage });
     } else {
@@ -92,217 +86,170 @@ export const SequenceGame: React.FC<SequenceGameProps> = ({ currentLanguage, onB
     setCheckedStatus(null);
   };
 
-  const handleVoiceCommand = () => {
-    if (isListening) {
-      speechEngine.stopListening();
-      setIsListening(false);
-      return;
-    }
-
-    setIsListening(true);
-    soundSynth.playSoftClick();
-    speechEngine.speak('Say check or shuffle', { language: currentLanguage });
-
-    speechEngine.startListening(
-      (transcript) => {
-        setIsListening(false);
-        const lower = transcript.toLowerCase();
-        if (lower.includes('check') || lower.includes('verify') || lower.includes('done') || lower.includes('correct')) {
-          handleVerify();
-        } else if (lower.includes('shuffle') || lower.includes('reset') || lower.includes('again')) {
-          handleReset();
-        }
-      },
-      (err) => {
-        setIsListening(false);
-      },
-      () => {
-        setIsListening(false);
-      },
-      currentLanguage
-    );
-  };
-
-
   return (
-    <div className="max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6" id="view-game-sequence">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#315C4C]/15">
-        <div className="flex items-center gap-3">
-          {onBackToApp && (
-            <button
-              onClick={() => {
-                soundSynth.playSoftClick();
-                onBackToApp();
-              }}
-              className="p-2.5 rounded-xl bg-[#EDE5D2] text-[#24483C] hover:bg-[#315C4C] hover:text-[#F8F4EA] transition-colors cursor-pointer"
-              title="Return to Courtyard"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          )}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🪘</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#24483C]">
-                Folk Ritual Sequencing
-              </h2>
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-game-sequence">
+      <div className="section-max max-w-4xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <div className="flex items-center gap-4">
+            {onBackToApp && (
+              <button
+                onClick={() => {
+                  soundSynth.playSoftClick();
+                  onBackToApp();
+                }}
+                className="w-10 h-10 rounded-xl bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 dark:border-[#D4AF37]/25 text-[#1A2F24] dark:text-[#F2EDE3] flex items-center justify-center cursor-pointer hover:border-[#D4AF37]"
+                title="Return to Courtyard"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🪘</span>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                  Folk Ritual Sequencing
+                </h2>
+              </div>
+              <p className="font-mono-label text-xs text-[#7B9E87] mt-0.5">
+                ARRANGE RITUAL STEPS FROM DAWN TO EVENING CELEBRATION
+              </p>
             </div>
-            <p className="text-xs sm:text-sm text-[#4A5B55]">
-              Arrange the steps in natural order from morning dawn to celebration
-            </p>
           </div>
-        </div>
 
-        {/* Theme Switcher */}
-        <div className="flex items-center gap-1.5 bg-[#EDE5D2] p-1.5 rounded-2xl border border-[#315C4C]/20">
-          <button
-            onClick={() => handleSwitchTheme('bihu')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              selectedTheme === 'bihu'
-                ? 'bg-[#315C4C] text-white shadow-xs'
-                : 'text-[#4A5B55] hover:bg-[#F8F4EA]'
-            }`}
-          >
-            🌸 Bihu Morning
-          </button>
-          <button
-            onClick={() => handleSwitchTheme('tea')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              selectedTheme === 'tea'
-                ? 'bg-[#315C4C] text-white shadow-xs'
-                : 'text-[#4A5B55] hover:bg-[#F8F4EA]'
-            }`}
-          >
-            🍃 Tea Plucking
-          </button>
-        </div>
-      </div>
-
-      {/* Main Sequencing Workspace */}
-      <div className="bg-[#FDFBF7] border-3 border-[#315C4C] rounded-3xl p-6 sm:p-8 shadow-xl text-[#24332E]">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-          <span className="text-sm font-bold text-[#315C4C] uppercase tracking-wider">
-            {selectedTheme === 'bihu' ? 'Festival Order' : 'Tea Garden Morning Cycle'}
-          </span>
-          <span className="text-xs text-[#4A5B55]">
-            Use the arrows to adjust order, then verify harmony
-          </span>
-        </div>
-
-        {/* Steps List */}
-        <div className="space-y-3.5">
-          {steps.map((step, idx) => (
-            <div
-              key={step.id}
-              className={`p-4 sm:p-5 rounded-2xl border-2 transition-all flex items-center justify-between gap-4 shadow-sm ${
-                isCompleted
-                  ? 'bg-emerald-50 border-emerald-400'
-                  : 'bg-[#F8F4EA] border-[#315C4C]/25 hover:border-[#315C4C]'
+          <div className="flex items-center gap-2 bg-[#F5EEE2] dark:bg-[#1A3328] p-1.5 rounded-full border border-[#2D4739]/15">
+            <button
+              onClick={() => handleSwitchTheme('bihu')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                selectedTheme === 'bihu'
+                  ? 'bg-[#1E3A2F] text-[#D4AF37] font-bold shadow-xs'
+                  : 'text-[#5A7265] dark:text-[#9DBFB0]'
               }`}
             >
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[#315C4C] text-[#D9A441] font-heading font-extrabold flex items-center justify-center text-lg shadow-xs shrink-0">
-                  {idx + 1}
+              🌸 Bihu Morning
+            </button>
+            <button
+              onClick={() => handleSwitchTheme('tea')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                selectedTheme === 'tea'
+                  ? 'bg-[#1E3A2F] text-[#D4AF37] font-bold shadow-xs'
+                  : 'text-[#5A7265] dark:text-[#9DBFB0]'
+              }`}
+            >
+              🍃 Tea Harvest
+            </button>
+          </div>
+        </div>
+
+        {/* Workspace Card */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 sm:p-10 border border-[#2D4739]/15 dark:border-[#D4AF37]/25 shadow-xl">
+          <div className="flex items-center justify-between mb-6">
+            <span className="font-mono-label text-xs text-[#C06A44] uppercase tracking-widest">
+              {selectedTheme === 'bihu' ? 'BIHU FESTIVAL SEQUENCE' : 'TEA PLUCKING CYCLE'}
+            </span>
+            <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">
+              Use arrows to arrange in order
+            </span>
+          </div>
+
+          {/* Steps List */}
+          <div className="space-y-4">
+            {steps.map((step, idx) => (
+              <div
+                key={step.id}
+                className={`card-story p-5 border transition-all flex items-center justify-between gap-4 ${
+                  isCompleted
+                    ? 'bg-[#7B9E87]/15 border-[#7B9E87]'
+                    : 'bg-[#FDFBF7] dark:bg-[#0F2219] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1E3A2F] text-[#D4AF37] font-display font-bold flex items-center justify-center text-lg shrink-0">
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <h4 className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-0.5">
+                      {step.description}
+                    </p>
+                    <span className="font-mono-label text-[10px] text-[#C06A44] mt-1 block">
+                      🌿 {step.culturalNote}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-heading font-bold text-base sm:text-lg text-[#24483C]">
-                    {step.title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-[#4A5B55] mt-0.5">
-                    {step.description}
-                  </p>
-                  <span className="text-[11px] text-[#C87552] font-semibold block mt-1">
-                    🌿 {step.culturalNote}
-                  </span>
-                </div>
+
+                {!isCompleted && (
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <button
+                      onClick={() => moveStep(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-2 rounded-lg bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 text-[#1A2F24] dark:text-[#F2EDE3] hover:border-[#D4AF37] disabled:opacity-25 cursor-pointer"
+                      title="Move up"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveStep(idx, 'down')}
+                      disabled={idx === steps.length - 1}
+                      className="p-2 rounded-lg bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 text-[#1A2F24] dark:text-[#F2EDE3] hover:border-[#D4AF37] disabled:opacity-25 cursor-pointer"
+                      title="Move down"
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
+            ))}
+          </div>
 
-              {/* Move Controls */}
-              {!isCompleted && (
-                <div className="flex flex-col gap-1 shrink-0">
-                  <button
-                    onClick={() => moveStep(idx, 'up')}
-                    disabled={idx === 0}
-                    className="p-2 rounded-lg bg-white border border-[#315C4C]/20 text-[#24483C] hover:bg-[#EDE5D2] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-2xs"
-                    title="Move earlier"
-                    aria-label={`Move ${step.title} up`}
-                  >
-                    <ArrowUp className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => moveStep(idx, 'down')}
-                    disabled={idx === steps.length - 1}
-                    className="p-2 rounded-lg bg-white border border-[#315C4C]/20 text-[#24483C] hover:bg-[#EDE5D2] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-2xs"
-                    title="Move later"
-                    aria-label={`Move ${step.title} down`}
-                  >
-                    <ArrowDown className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+          {/* Outcome Banners */}
+          {checkedStatus === true && (
+            <div className="mt-8 p-6 rounded-2xl bg-[#7B9E87]/15 border border-[#7B9E87] text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-4 animate-slide-up">
+              <CheckCircle2 className="w-8 h-8 text-[#7B9E87] shrink-0" />
+              <div>
+                <h4 className="font-display text-xl font-bold">Well Sequenced!</h4>
+                <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-1">
+                  You have woven the ritual together with clear procedural recall and harmony.
+                </p>
+              </div>
             </div>
-          ))}
+          )}
+
+          {checkedStatus === false && (
+            <div className="mt-8 p-6 rounded-2xl bg-[#C06A44]/15 border border-[#C06A44] text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-4 animate-slide-up">
+              <Sparkles className="w-6 h-6 text-[#C06A44] shrink-0" />
+              <div>
+                <h4 className="font-display text-lg font-bold">Almost there!</h4>
+                <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-1">
+                  Think about what happens at first sunrise before the afternoon community feast.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="mt-10 pt-6 border-t border-[#2D4739]/10 dark:border-[#D4AF37]/15 flex items-center justify-between flex-wrap gap-4">
+            <button
+              onClick={handleReset}
+              className="btn-ghost py-3 px-5 text-xs font-semibold"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Shuffle Again</span>
+            </button>
+
+            <button
+              onClick={handleVerify}
+              className="btn-primary py-3.5 px-6"
+            >
+              <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+              <span>Verify Sequence Harmony</span>
+            </button>
+          </div>
         </div>
 
-        {/* Verification & Outcome Banners */}
-        {checkedStatus === true && (
-          <div className="mt-6 p-5 rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-emerald-950 flex items-center gap-3 animate-fadeIn">
-            <CheckCircle2 className="w-7 h-7 text-emerald-700 shrink-0" />
-            <div>
-              <h4 className="font-bold text-lg">Well Sequenced!</h4>
-              <p className="text-sm text-emerald-800">
-                You have woven the ritual together with clear procedural recall and harmony.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {checkedStatus === false && (
-          <div className="mt-6 p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3 animate-fadeIn">
-            <Sparkles className="w-6 h-6 text-[#C87552] shrink-0" />
-            <div>
-              <h4 className="font-bold text-base">Almost there!</h4>
-              <p className="text-xs sm:text-sm text-amber-800">
-                Think about what happens at first sunrise, before the afternoon community feast.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Action Controls */}
-        <div className="mt-8 pt-6 border-t border-[#315C4C]/15 flex items-center justify-between flex-wrap gap-4">
-          <button
-            onClick={handleReset}
-            className="px-4 py-2.5 rounded-xl bg-white border border-[#315C4C]/30 text-[#4A5B55] font-semibold text-sm hover:bg-[#EDE5D2] transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>Shuffle Again</span>
-          </button>
-
-          <GameVoiceAnswerButton
-            options={['Check Sequence', 'Verify Order', 'Reset Sequence', 'Shuffle Cards', ...steps.map((s) => s.title)]}
-            onOptionMatched={(matchedOption) => {
-              const lower = matchedOption.toLowerCase();
-              if (lower.includes('check') || lower.includes('verify')) {
-                handleVerify();
-              } else if (lower.includes('reset') || lower.includes('shuffle')) {
-                handleReset();
-              }
-            }}
-            currentLanguage={currentLanguage}
-            promptMessage="Say check sequence or shuffle cards"
-            label="Speak Action"
-          />
-
-          <button
-            onClick={handleVerify}
-            className="px-7 py-3.5 rounded-2xl bg-[#315C4C] hover:bg-[#24483C] text-[#F8F4EA] font-extrabold text-base flex items-center gap-2 shadow-md transition-colors cursor-pointer focus-accessible"
-          >
-            <CheckCircle2 className="w-5 h-5 text-[#D9A441]" />
-            <span>Check Sequence Harmony</span>
-          </button>
-        </div>
       </div>
     </div>
   );

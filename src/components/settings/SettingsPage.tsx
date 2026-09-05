@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Globe, Type, Eye, Volume2, Bell, Shield, Users, Moon, Sun, ChevronRight, Save, CheckCircle2 } from 'lucide-react';
+import { User, Globe, Type, Eye, Volume2, Bell, Shield, Users, Save, CheckCircle2, ChevronRight } from 'lucide-react';
 import { AccessibilitySettings, Language } from '../../types';
 import { NER_LANGUAGES } from '../../data/mockData';
 import { apiClient } from '../../services/api/apiClient';
@@ -45,133 +45,132 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   ];
 
   return (
-    <div className="py-6 sm:py-10 px-4 sm:px-6" id="view-settings">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-settings">
+      <div className="section-max max-w-3xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#6A9B96]/15 flex items-center justify-center">
-            <User className="w-6 h-6 text-[#6A9B96]" />
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] flex items-center justify-center text-xl">
+            ⚙️
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#1E3A2F]">
-              Profile & Settings
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] tracking-tight">
+              Profile & Accessibility
             </h1>
-            <p className="text-sm text-[#52635D]">
-              Customize your experience
+            <p className="text-sm text-[#5A7265] dark:text-[#9DBFB0] mt-0.5">
+              Tailor display size, languages, voice guidance, and privacy controls
             </p>
           </div>
         </div>
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
+        {/* Personal Profile */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20 space-y-6">
+          <h2 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-2">
             <User className="w-5 h-5 text-[#D4AF37]" />
-            Personal Information
+            Personal Account Information
           </h2>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/20 flex items-center justify-center text-4xl">
+
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-4xl shrink-0">
               👴🏽
             </div>
             <div>
-              <p className="text-lg font-extrabold text-[#1E3A2F]">Bhaben Hazarika</p>
-              <p className="text-sm text-[#52635D]">72 years · Guwahati, Assam</p>
+              <p className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">Bhaben Hazarika</p>
+              <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-0.5">72 years • Guwahati, Assam</p>
             </div>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#52635D] mb-1.5 uppercase tracking-wider">Name</label>
+              <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-1.5 uppercase tracking-wider">Name</label>
               <input
                 type="text"
                 defaultValue="Bhaben Hazarika"
-                className="w-full py-3 px-4 rounded-xl bg-[#F5EFE6] border border-[#2D4739]/10 text-[#1E3A2F] font-semibold focus:outline-none focus:border-[#D4AF37] transition-all"
+                className="w-full py-3 px-4 rounded-xl bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/15 text-[#1A2F24] dark:text-[#F2EDE3] font-semibold focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#52635D] mb-1.5 uppercase tracking-wider">Phone</label>
+              <label className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-1.5 uppercase tracking-wider">Phone</label>
               <input
                 type="tel"
                 defaultValue="+91 98765 43210"
-                className="w-full py-3 px-4 rounded-xl bg-[#F5EFE6] border border-[#2D4739]/10 text-[#1E3A2F] font-semibold focus:outline-none focus:border-[#D4AF37] transition-all"
+                className="w-full py-3 px-4 rounded-xl bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/15 text-[#1A2F24] dark:text-[#F2EDE3] font-semibold focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
           </div>
         </div>
 
-        {/* Language */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-[#C66B44]" />
-            Language
+        {/* Regional Language Selection */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <h2 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-4 flex items-center gap-2">
+            <Globe className="w-5 h-5 text-[#C06A44]" />
+            Mother Tongue & Regional Language
           </h2>
+
           <button
             onClick={() => setShowLanguageModal(true)}
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl bg-[#F5EFE6] border border-[#2D4739]/10 cursor-pointer hover:border-[#D4AF37] transition-all"
+            className="card-story w-full flex items-center justify-between p-5 bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/15 dark:border-[#D4AF37]/20 cursor-pointer hover:border-[#D4AF37]"
           >
             <div>
-              <span className="block text-base font-bold text-[#1E3A2F]">
+              <span className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">
                 {NER_LANGUAGES.find(l => l.id === currentLanguage)?.nativeScript || currentLanguage}
               </span>
-              <span className="block text-xs text-[#52635D]">
+              <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">
                 {NER_LANGUAGES.find(l => l.id === currentLanguage)?.region || ''}
               </span>
             </div>
-            <ChevronRight className="w-5 h-5 text-[#52635D]" />
+            <ChevronRight className="w-5 h-5 text-[#7B9E87]" />
           </button>
         </div>
 
-        {/* Display Size */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-2 flex items-center gap-2">
+        {/* Font Size Scaling */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <h2 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-1 flex items-center gap-2">
             <Type className="w-5 h-5 text-[#D4AF37]" />
-            Display Size
+            Text Display Size
           </h2>
-          <p className="text-sm text-[#52635D] mb-4">Choose text size for comfortable reading.</p>
-          <div className="space-y-2">
+          <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mb-6">Select a text scale for comfortable reading.</p>
+          
+          <div className="space-y-3">
             {fontSizes.map((size) => (
               <button
                 key={size.id}
                 onClick={() => onUpdateSettings({ fontSize: size.id })}
-                className={`w-full flex items-center justify-between py-4 px-5 rounded-2xl border-2 cursor-pointer transition-all ${
+                className={`card-story w-full p-4 flex items-center justify-between cursor-pointer border transition-all ${
                   accessibilitySettings.fontSize === size.id
-                    ? 'bg-[#1E3A2F] text-[#FDFBF7] border-[#1E3A2F] shadow-md'
-                    : 'bg-white text-[#1E3A2F] border-[#2D4739]/10 hover:border-[#D4AF37]'
+                    ? 'bg-[#1E3A2F] text-[#FDFBF7] border-[#D4AF37] shadow-md'
+                    : 'bg-[#FDFBF7] dark:bg-[#0F2219] text-[#1A2F24] dark:text-[#F2EDE3] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
                 }`}
               >
                 <div>
-                  <span className="block text-base font-extrabold">{size.label}</span>
-                  <span className={`block text-xs ${
-                    accessibilitySettings.fontSize === size.id ? 'text-[#D4AF37]' : 'text-[#52635D]'
-                  }`}>
-                    {size.desc}
-                  </span>
+                  <span className="font-display text-base font-bold block">{size.label}</span>
+                  <span className="text-xs opacity-80">{size.desc}</span>
                 </div>
                 {accessibilitySettings.fontSize === size.id && (
-                  <div className="w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4 text-[#1E3A2F]" />
-                  </div>
+                  <CheckCircle2 className="w-5 h-5 text-[#D4AF37]" />
                 )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Accessibility */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <Eye className="w-5 h-5 text-[#6A9B96]" />
-            Accessibility
+        {/* Visual Accessibility Toggles */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20 space-y-6">
+          <h2 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-2">
+            <Eye className="w-5 h-5 text-[#7B9E87]" />
+            Visual Accessibility
           </h2>
-          <div className="space-y-4">
+
+          <div className="space-y-5">
             {/* High Contrast */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="block text-base font-bold text-[#1E3A2F]">High Contrast Mode</span>
-                <span className="block text-xs text-[#52635D]">Enhanced contrast for visibility</span>
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">High Contrast Mode</span>
+                <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">Enhanced contrast for visual clarity</span>
               </div>
               <button
                 onClick={() => onUpdateSettings({ highContrast: !accessibilitySettings.highContrast })}
                 className={`w-14 h-8 rounded-full transition-all cursor-pointer relative ${
-                  accessibilitySettings.highContrast ? 'bg-[#2D4739]' : 'bg-[#EAE2D2]'
+                  accessibilitySettings.highContrast ? 'bg-[#1E3A2F]' : 'bg-[#F5EEE2] dark:bg-[#1A3328]'
                 }`}
                 role="switch"
                 aria-checked={accessibilitySettings.highContrast}
@@ -185,13 +184,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             {/* Dark Mode */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="block text-base font-bold text-[#1E3A2F]">Night Mode</span>
-                <span className="block text-xs text-[#52635D]">Darker theme for evening use</span>
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">Night Mode Theme</span>
+                <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">Deep forest theme for evening comfort</span>
               </div>
               <button
                 onClick={() => onUpdateSettings({ darkMode: !accessibilitySettings.darkMode })}
                 className={`w-14 h-8 rounded-full transition-all cursor-pointer relative ${
-                  accessibilitySettings.darkMode ? 'bg-[#2D4739]' : 'bg-[#EAE2D2]'
+                  accessibilitySettings.darkMode ? 'bg-[#1E3A2F]' : 'bg-[#F5EEE2] dark:bg-[#1A3328]'
                 }`}
                 role="switch"
                 aria-checked={accessibilitySettings.darkMode}
@@ -205,13 +204,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             {/* Reduced Motion */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="block text-base font-bold text-[#1E3A2F]">Reduced Motion</span>
-                <span className="block text-xs text-[#52635D]">Minimize animations</span>
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">Reduced Motion</span>
+                <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">Minimize ambient UI animations</span>
               </div>
               <button
                 onClick={() => onUpdateSettings({ reducedMotion: !accessibilitySettings.reducedMotion })}
                 className={`w-14 h-8 rounded-full transition-all cursor-pointer relative ${
-                  accessibilitySettings.reducedMotion ? 'bg-[#2D4739]' : 'bg-[#EAE2D2]'
+                  accessibilitySettings.reducedMotion ? 'bg-[#1E3A2F]' : 'bg-[#F5EEE2] dark:bg-[#1A3328]'
                 }`}
                 role="switch"
                 aria-checked={accessibilitySettings.reducedMotion}
@@ -224,22 +223,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </div>
         </div>
 
-        {/* Voice */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
+        {/* Voice Assistance */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20 space-y-6">
+          <h2 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-2">
             <Volume2 className="w-5 h-5 text-[#D4AF37]" />
-            Voice Assistance
+            Voice Assistance & Speech
           </h2>
-          <div className="space-y-4">
+
+          <div className="space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="block text-base font-bold text-[#1E3A2F]">Voice Guide</span>
-                <span className="block text-xs text-[#52635D]">Read instructions aloud</span>
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">Spoken Voice Prompts</span>
+                <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">Automatically read activity prompts aloud</span>
               </div>
               <button
                 onClick={() => onUpdateSettings({ voiceGuideEnabled: !accessibilitySettings.voiceGuideEnabled })}
                 className={`w-14 h-8 rounded-full transition-all cursor-pointer relative ${
-                  accessibilitySettings.voiceGuideEnabled ? 'bg-[#2D4739]' : 'bg-[#EAE2D2]'
+                  accessibilitySettings.voiceGuideEnabled ? 'bg-[#1E3A2F]' : 'bg-[#F5EEE2] dark:bg-[#1A3328]'
                 }`}
                 role="switch"
                 aria-checked={accessibilitySettings.voiceGuideEnabled}
@@ -249,90 +249,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 }`} />
               </button>
             </div>
+
             <div className="flex items-center justify-between">
               <div>
-                <span className="block text-base font-bold text-[#1E3A2F]">Voice Speed</span>
-                <span className="block text-xs text-[#52635D]">
+                <span className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3] block">Speech Cadence</span>
+                <span className="text-xs text-[#5A7265] dark:text-[#9DBFB0]">
                   Currently: {accessibilitySettings.voiceSpeed === 'slow' ? 'Gentle & Slow' : 'Normal'}
                 </span>
               </div>
               <button
                 onClick={() => onUpdateSettings({ voiceSpeed: accessibilitySettings.voiceSpeed === 'slow' ? 'normal' : 'slow' })}
-                className="px-4 py-2 rounded-xl bg-[#F5EFE6] border border-[#2D4739]/10 text-sm font-bold text-[#1E3A2F] cursor-pointer hover:border-[#D4AF37] transition-all"
+                className="btn-ghost py-2 px-4 text-xs font-semibold"
               >
-                {accessibilitySettings.voiceSpeed === 'slow' ? 'Switch to Normal' : 'Switch to Slow'}
+                {accessibilitySettings.voiceSpeed === 'slow' ? 'Set to Normal' : 'Set to Slow'}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Notifications */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <Bell className="w-5 h-5 text-[#C66B44]" />
-            Notifications
-          </h2>
-          <div className="space-y-3">
-            {['Activity Reminders', 'Medicine Reminders', 'Weekly Summary', 'Achievement Alerts'].map((item) => (
-              <div key={item} className="flex items-center justify-between py-2">
-                <span className="text-base font-bold text-[#1E3A2F]">{item}</span>
-                <button
-                  className="w-14 h-8 rounded-full bg-[#2D4739] cursor-pointer relative"
-                  role="switch"
-                  aria-checked={true}
-                >
-                  <div className="absolute top-1 left-7 w-6 h-6 rounded-full bg-white shadow-md" />
-                </button>
-              </div>
-            ))}
+        {/* Privacy Banner */}
+        <div className="card-story bg-[#1E3A2F] text-[#FDFBF7] p-8 border border-[#D4AF37]/30 space-y-3">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-[#D4AF37]" />
+            <h2 className="font-display text-lg font-bold">Encrypted Local Data Privacy</h2>
           </div>
-        </div>
-
-        {/* Caregiver Connection */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-6">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#6A9B96]" />
-            Caregiver Connection
-          </h2>
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#F5EFE6] border border-[#2D4739]/10">
-            <div className="w-12 h-12 rounded-xl bg-[#C66B44]/15 flex items-center justify-center text-2xl">👩🏽</div>
-            <div>
-              <p className="text-base font-bold text-[#1E3A2F]">Anindita Baruah</p>
-              <p className="text-xs text-[#52635D]">Daughter · Connected</p>
-            </div>
-            <span className="ml-auto w-3 h-3 rounded-full bg-emerald-400" />
-          </div>
-        </div>
-
-        {/* Privacy */}
-        <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm mb-8">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-[#2D4739]" />
-            Privacy & Data
-          </h2>
-          <p className="text-sm text-[#52635D] mb-4">
-            Your data is encrypted and stored locally. No personal health information is shared without your consent.
+          <p className="text-xs text-[#C8D8CF] leading-relaxed">
+            All personal photographs, speech transcripts, and daily scores are encrypted locally on device. DPDP Act 2023 Compliant.
           </p>
-          <div className="flex items-center gap-2 text-xs font-bold text-[#6A9B96]">
-            <Shield className="w-4 h-4" />
-            <span>AES-256 Encrypted · DPDP Act 2023 Compliant</span>
-          </div>
         </div>
 
         {/* Save Button */}
         <button
           onClick={handleSave}
-          className="w-full py-4 rounded-2xl bg-[#1E3A2F] hover:bg-[#2D4739] text-[#FDFBF7] font-extrabold text-lg flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer focus-accessible"
+          className="btn-primary w-full py-4 text-base"
         >
           {saved ? (
             <>
               <CheckCircle2 className="w-5 h-5 text-[#D4AF37]" />
-              Saved!
+              <span>Settings Saved!</span>
             </>
           ) : (
             <>
-              <Save className="w-5 h-5" />
-              Save Settings
+              <Save className="w-5 h-5 text-[#D4AF37]" />
+              <span>Save Preferences</span>
             </>
           )}
         </button>
@@ -340,13 +299,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
       {/* Language Selection Modal */}
       {showLanguageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl bg-[#FDFBF7] p-6 shadow-2xl border border-[#2D4739]/10 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-extrabold text-[#1E3A2F] mb-6 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-[#C66B44]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-slide-up">
+          <div className="card-story w-full max-w-md bg-white dark:bg-[#162A1F] p-8 border border-[#D4AF37]/30 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <h3 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-6 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-[#C06A44]" />
               Choose Language
             </h3>
-            <div className="space-y-2">
+
+            <div className="space-y-3">
               {NER_LANGUAGES.map((lang) => (
                 <button
                   key={lang.id}
@@ -354,19 +314,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     onSelectLanguage(lang.id as Language);
                     setShowLanguageModal(false);
                   }}
-                  className={`w-full flex items-center justify-between py-4 px-5 rounded-2xl border-2 cursor-pointer transition-all text-left ${
+                  className={`card-story w-full p-4 flex items-center justify-between cursor-pointer border transition-all text-left ${
                     currentLanguage === lang.id
-                      ? 'bg-[#1E3A2F] text-[#FDFBF7] border-[#1E3A2F] shadow-md'
-                      : 'bg-white text-[#1E3A2F] border-[#2D4739]/10 hover:border-[#D4AF37]'
+                      ? 'bg-[#1E3A2F] text-[#FDFBF7] border-[#D4AF37] shadow-md'
+                      : 'bg-[#FDFBF7] dark:bg-[#0F2219] text-[#1A2F24] dark:text-[#F2EDE3] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
                   }`}
                 >
                   <div>
-                    <span className="block text-lg font-extrabold">{lang.nativeScript}</span>
-                    <span className={`block text-xs mt-0.5 ${
-                      currentLanguage === lang.id ? 'text-[#D4AF37]' : 'text-[#52635D]'
-                    }`}>
-                      {lang.name} · {lang.region}
-                    </span>
+                    <span className="font-display text-lg font-bold block">{lang.nativeScript}</span>
+                    <span className="text-xs opacity-80">{lang.name} • {lang.region}</span>
                   </div>
                   {currentLanguage === lang.id && (
                     <CheckCircle2 className="w-5 h-5 text-[#D4AF37] shrink-0" />
@@ -374,9 +330,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </button>
               ))}
             </div>
+
             <button
               onClick={() => setShowLanguageModal(false)}
-              className="w-full mt-4 py-3 rounded-2xl bg-[#F5EFE6] text-[#52635D] font-bold cursor-pointer hover:bg-[#EAE2D2] transition-all"
+              className="btn-ghost w-full mt-6 py-3 text-xs"
             >
               Close
             </button>

@@ -67,39 +67,30 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'activity': return 'bg-[#6A9B96]/15 text-[#6A9B96]';
-      case 'achievement': return 'bg-[#D4AF37]/15 text-[#D4AF37]';
-      case 'routine': return 'bg-[#C66B44]/15 text-[#C66B44]';
-      case 'reminder': return 'bg-rose-100 text-rose-600';
-      default: return 'bg-[#F5EFE6] text-[#52635D]';
-    }
-  };
-
   const content = (
-    <>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#C66B44]/15 flex items-center justify-center relative">
-            <Bell className="w-5 h-5 text-[#C66B44]" />
+          <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] flex items-center justify-center relative">
+            <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C66B44] text-white text-[10px] font-extrabold flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C06A44] text-white text-[9px] font-bold flex items-center justify-center">
                 {unreadCount}
               </span>
             )}
           </div>
           <div>
-            <h2 className="text-xl font-extrabold text-[#1E3A2F]">Notifications</h2>
-            <p className="text-xs text-[#52635D]">{unreadCount} unread</p>
+            <h2 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">Notifications</h2>
+            <p className="font-mono-label text-[10px] text-[#7B9E87]">{unreadCount} UNREAD MESSAGES</p>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#6A9B96] hover:bg-[#F5EFE6] cursor-pointer transition-colors"
+              className="text-xs font-semibold text-[#7B9E87] hover:text-[#1A2F24] dark:hover:text-[#F2EDE3] cursor-pointer"
             >
               Mark all read
             </button>
@@ -107,45 +98,40 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           {isModal && onClose && (
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-[#F5EFE6] cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#F5EEE2] dark:bg-[#1A3328] flex items-center justify-center cursor-pointer"
             >
-              <X className="w-5 h-5 text-[#52635D]" />
+              <X className="w-4 h-4 text-[#5A7265]" />
             </button>
           )}
         </div>
       </div>
 
       {/* Notifications List */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className={`relative flex items-start gap-4 p-4 rounded-2xl border transition-all ${
+            className={`card-story p-5 border transition-all flex items-start gap-4 ${
               notification.read
-                ? 'bg-white border-[#2D4739]/08'
-                : 'bg-[#D4AF37]/05 border-[#D4AF37]/20 shadow-sm'
+                ? 'bg-white dark:bg-[#162A1F] border-[#2D4739]/10 dark:border-[#D4AF37]/15 opacity-75'
+                : 'bg-[#FDFBF7] dark:bg-[#0F2219] border-[#D4AF37]/30 shadow-md'
             }`}
           >
-            {/* Unread indicator */}
-            {!notification.read && (
-              <div className="absolute top-4 left-2 w-2 h-2 rounded-full bg-[#D4AF37]" />
-            )}
-
             {/* Icon */}
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${getTypeColor(notification.type)}`}>
+            <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/20 flex items-center justify-center text-xl shrink-0">
               {notification.icon}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <h3 className={`text-sm font-extrabold ${notification.read ? 'text-[#52635D]' : 'text-[#1E3A2F]'}`}>
+              <h3 className="font-display text-base font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
                 {notification.title}
               </h3>
-              <p className="text-xs text-[#52635D] mt-0.5 leading-relaxed">
+              <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-1 leading-relaxed">
                 {notification.message}
               </p>
-              <div className="flex items-center gap-3 mt-2">
-                <span className="text-[10px] font-bold text-[#6A9B96]">{notification.timestamp}</span>
+              <div className="flex items-center gap-4 mt-3">
+                <span className="font-mono-label text-[10px] text-[#7B9E87]">{notification.timestamp}</span>
                 {notification.actionView && (
                   <button
                     onClick={() => {
@@ -153,7 +139,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       onNavigate(notification.actionView!);
                       onClose?.();
                     }}
-                    className="flex items-center gap-1 text-[10px] font-bold text-[#C66B44] hover:text-[#D4AF37] cursor-pointer transition-colors"
+                    className="flex items-center gap-1 font-mono-label text-[10px] text-[#C06A44] dark:text-[#D4AF37] font-bold cursor-pointer"
                   >
                     View <ArrowRight className="w-3 h-3" />
                   </button>
@@ -166,39 +152,39 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               {!notification.read && (
                 <button
                   onClick={() => markAsRead(notification.id)}
-                  className="p-1.5 rounded-lg hover:bg-[#F5EFE6] text-[#6A9B96] cursor-pointer"
+                  className="p-1 text-[#7B9E87] hover:text-[#1A2F24] cursor-pointer"
                   aria-label="Mark as read"
                 >
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="w-4 h-4" />
                 </button>
               )}
               <button
                 onClick={() => deleteNotification(notification.id)}
-                className="p-1.5 rounded-lg hover:bg-rose-50 text-[#52635D] hover:text-rose-500 cursor-pointer"
+                className="p-1 text-[#5A7265] hover:text-[#C06A44] cursor-pointer"
                 aria-label="Delete notification"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
         ))}
 
         {notifications.length === 0 && (
-          <div className="text-center py-12">
+          <div className="card-story bg-white dark:bg-[#162A1F] p-10 text-center border border-[#2D4739]/15">
             <span className="text-4xl block mb-3">🔔</span>
-            <h3 className="text-base font-bold text-[#1E3A2F]">All caught up!</h3>
-            <p className="text-sm text-[#52635D]">No notifications right now.</p>
+            <h3 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">All caught up!</h3>
+            <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-1">No notifications right now.</p>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 flex items-start justify-end p-4 bg-black/30 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
+      <div className="fixed inset-0 z-50 flex items-start justify-end p-4 bg-black/60 backdrop-blur-xs animate-slide-up" onClick={onClose}>
         <div
-          className="w-full max-w-md mt-16 rounded-3xl bg-[#FDFBF7] p-6 shadow-2xl border border-[#2D4739]/10 max-h-[70vh] overflow-y-auto"
+          className="w-full max-w-md mt-16 card-story bg-white dark:bg-[#162A1F] p-6 shadow-2xl border border-[#D4AF37]/30 max-h-[75vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {content}
@@ -208,8 +194,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }
 
   return (
-    <div className="py-6 sm:py-10 px-4 sm:px-6" id="view-notifications">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-notifications">
+      <div className="section-max max-w-2xl mx-auto">
         {content}
       </div>
     </div>

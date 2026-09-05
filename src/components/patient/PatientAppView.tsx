@@ -15,15 +15,15 @@ interface PatientAppViewProps {
 
 const getGreeting = () => {
   const hour = new Date().getHours();
-  if (hour < 12) return { text: 'Good Morning', icon: <Sun className="w-5 h-5 text-amber-500" />, emoji: '☀️' };
-  if (hour < 17) return { text: 'Good Afternoon', icon: <Cloud className="w-5 h-5 text-[#6A9B96]" />, emoji: '🌤️' };
-  return { text: 'Good Evening', icon: <Moon className="w-5 h-5 text-indigo-400" />, emoji: '🌙' };
+  if (hour < 12) return { text: 'Good Morning', icon: <Sun className="w-4 h-4 text-[#D4AF37]" />, emoji: '☀️' };
+  if (hour < 17) return { text: 'Good Afternoon', icon: <Cloud className="w-4 h-4 text-[#7B9E87]" />, emoji: '🌤️' };
+  return { text: 'Good Evening', icon: <Moon className="w-4 h-4 text-[#D4AF37]" />, emoji: '🌙' };
 };
 
 const DEFAULT_ACTIVITIES = [
-  { id: 'rec-1', name: 'Memory Match', icon: '🃏', time: '5 min', difficulty: 'Easy', view: 'game-memory' as ActiveView, color: '#C66B44' },
-  { id: 'rec-2', name: 'Find the Difference', icon: '🔍', time: '5 min', difficulty: 'Easy', view: 'game-attention' as ActiveView, color: '#6A9B96' },
-  { id: 'rec-3', name: 'Cultural Patterns', icon: '🪡', time: '5 min', difficulty: 'Medium', view: 'game-cultural' as ActiveView, color: '#D4AF37' },
+  { id: 'rec-1', name: 'Memory Recall', icon: '🃏', time: '5 min', difficulty: 'Easy', view: 'game-memory' as ActiveView, color: '#C06A44' },
+  { id: 'rec-2', name: 'Visual Attention', icon: '🔍', time: '5 min', difficulty: 'Easy', view: 'game-attention' as ActiveView, color: '#7B9E87' },
+  { id: 'rec-3', name: 'Cultural Wisdom', icon: '🪡', time: '5 min', difficulty: 'Medium', view: 'game-cultural' as ActiveView, color: '#D4AF37' },
 ];
 
 export const PatientAppView: React.FC<PatientAppViewProps> = ({
@@ -44,12 +44,12 @@ export const PatientAppView: React.FC<PatientAppViewProps> = ({
         if (Array.isArray(data) && data.length > 0) {
           const mapped = data.map((rec: any, idx: number) => ({
             id: rec.id || `rec-${idx}`,
-            name: rec.title || rec.game?.title || rec.name || 'Memory Match',
+            name: rec.title || rec.game?.title || rec.name || 'Memory Recall',
             icon: rec.icon || (idx === 0 ? '🃏' : idx === 1 ? '🔍' : '🪡'),
             time: rec.estimatedMinutes ? `${rec.estimatedMinutes} min` : '5 min',
             difficulty: rec.difficultyLevel || rec.difficulty || 'Easy',
             view: (rec.gameId === 'game-attention' || rec.gameId === 'game-cultural') ? rec.gameId as ActiveView : 'game-memory' as ActiveView,
-            color: idx === 0 ? '#C66B44' : idx === 1 ? '#6A9B96' : '#D4AF37',
+            color: idx === 0 ? '#C06A44' : idx === 1 ? '#7B9E87' : '#D4AF37',
           }));
           setRecommendations(mapped);
         }
@@ -70,228 +70,239 @@ export const PatientAppView: React.FC<PatientAppViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FDFBF7] to-[#F5EFE6]" id="view-patient-dashboard">
-      <div className="max-w-5xl mx-auto py-6 sm:py-10 px-4 sm:px-6 space-y-6 sm:space-y-8">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-patient-dashboard">
+      <div className="section-max space-y-10">
 
-        {/* ── WELCOME BANNER ── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1E3A2F] via-[#2D4739] to-[#1E3A2F] p-6 sm:p-8 shadow-2xl animate-slide-in-up">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#C66B44]/10 rounded-full blur-3xl pointer-events-none" />
+        {/* ── COURTYARD WELCOME HERO ── */}
+        <div className="card-story bg-gradient-to-br from-[#1E3A2F] via-[#2D4739] to-[#1E3A2F] text-[#FDFBF7] p-8 sm:p-12 border border-[#D4AF37]/35 shadow-xl">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-5xl shadow-md animate-companion-breathe shrink-0">
+                👴🏽
+              </div>
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] font-mono-label text-[11px] uppercase tracking-widest mb-2">
+                  {greeting.icon}
+                  <span>{greeting.emoji} {greeting.text}</span>
+                </div>
+                <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#FDFBF7]">
+                  Namaskar, {userName}!
+                </h1>
+                <p className="text-sm text-[#C8D8CF] mt-2">
+                  Welcome to your personal courtyard. Ready for today's gentle activities?
+                </p>
+              </div>
+            </div>
 
-          <div className="relative z-10">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#D4AF37] flex items-center justify-center text-4xl sm:text-5xl shadow-lg animate-companion-breathe shrink-0">
-                  👴🏽
-                </div>
-                <div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-black uppercase tracking-wide mb-1">
-                    {greeting.icon}
-                    <span>{greeting.emoji} {greeting.text}</span>
-                  </div>
-                  <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-[#FDFBF7] leading-tight">
-                    Namaskar, {userName}!
-                  </h1>
-                  <p className="text-sm text-[#EAE2D2]/70 mt-1">
-                    Ready for today's activities?
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <button
-                  onClick={() => { soundSynth.playGentleChime(); onOpenCompanion(); }}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#D4AF37] hover:bg-[#E5C45B] text-[#1E3A2F] font-extrabold text-sm shadow-lg hover:scale-105 transition-all cursor-pointer"
-                >
-                  <Mic className="w-5 h-5" />
-                  {t.talkToOja}
-                </button>
-                <button
-                  onClick={handleSpeakGreeting}
-                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 text-[#FDFBF7] font-bold text-sm border border-white/20 transition-all cursor-pointer"
-                  aria-label="Hear greeting spoken aloud"
-                >
-                  <Volume2 className="w-5 h-5 text-[#D4AF37]" />
-                </button>
-              </div>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <button
+                onClick={() => { soundSynth.playGentleChime(); onOpenCompanion(); }}
+                className="btn-gold flex-1 md:flex-initial py-3.5 px-6"
+              >
+                <Mic className="w-5 h-5" />
+                <span>{t.talkToOja}</span>
+              </button>
+
+              <button
+                onClick={handleSpeakGreeting}
+                className="btn-ghost text-white border-white/30 hover:bg-white/15 py-3.5 px-4"
+                aria-label="Hear greeting spoken aloud"
+              >
+                <Volume2 className="w-5 h-5 text-[#D4AF37]" />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* ── TODAY'S COGNITIVE SESSION ── */}
-        <div className="animate-slide-in-up-delay-1">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
+        {/* ── FEATURED TODAY'S COGNITIVE SESSION ── */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[#D4AF37]" />
-            Today's Cognitive Session
-          </h2>
+            <h2 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+              Today's Memory Activity
+            </h2>
+          </div>
+
           <button
             onClick={() => { soundSynth.playSoftClick(); onNavigate('game-memory'); }}
-            className="card-lift group w-full relative overflow-hidden rounded-3xl bg-white border-2 border-[#D4AF37]/30 p-6 sm:p-8 text-left shadow-md cursor-pointer focus-accessible"
+            className="card-story w-full bg-white dark:bg-[#162A1F] p-8 border border-[#D4AF37]/40 text-left shadow-lg cursor-pointer group"
           >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shimmer-bg pointer-events-none" />
-            <div className="relative z-10 flex items-center gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C66B44] to-[#D9835E] flex items-center justify-center text-5xl shadow-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
-                🃏
-              </div>
-              <div className="flex-1">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#C66B44]/15 text-[#C66B44] text-[10px] font-black uppercase tracking-wide mb-2">
-                  Recommended for you
-                </span>
-                <h3 className="font-heading font-extrabold text-xl sm:text-2xl text-[#1E3A2F] mb-1">
-                  Memory Match
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-[#52635D] font-semibold">
-                  <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> 5 minutes</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Easy</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-3xl bg-[#C06A44] text-white flex items-center justify-center text-4xl shadow-md group-hover:scale-105 transition-transform shrink-0">
+                  🃏
+                </div>
+                <div>
+                  <span className="font-mono-label text-[10px] text-[#C06A44] uppercase tracking-widest block mb-1">
+                    RECOMMENDED SESSION
+                  </span>
+                  <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                    Memory Recall — Life Story Album
+                  </h3>
+                  <div className="flex items-center gap-4 text-xs font-semibold text-[#5A7265] dark:text-[#9DBFB0] mt-2">
+                    <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#D4AF37]" /> 5 minutes</span>
+                    <span>•</span>
+                    <span className="text-[#7B9E87]">Gentle & Familiar</span>
+                  </div>
                 </div>
               </div>
-              <div className="hidden sm:flex items-center gap-2 bg-[#1E3A2F] text-[#FDFBF7] py-3 px-6 rounded-2xl font-extrabold text-sm shadow-md group-hover:bg-[#D4AF37] group-hover:text-[#1E3A2F] transition-all">
-                <Play className="w-5 h-5" />
-                Start
+
+              <div className="btn-primary py-3.5 px-6 self-start sm:self-center shrink-0">
+                <Play className="w-4 h-4 text-[#D4AF37]" />
+                <span>Begin Activity</span>
               </div>
             </div>
           </button>
         </div>
 
-        {/* ── YOUR PROGRESS ── */}
-        <div className="animate-slide-in-up-delay-2">
-          <h2 className="text-lg font-extrabold text-[#1E3A2F] mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-[#6A9B96]" />
-            Your Progress
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 shadow-sm text-center">
-              <span className="block text-2xl font-extrabold text-[#1E3A2F]">23</span>
-              <span className="block text-xs font-bold text-[#52635D] mt-1">Activities Done</span>
+        {/* ── PERSONAL RHYTHM & STATS ── */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-[#7B9E87]" />
+            <h2 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+              Your Memory Rhythm
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div className="card-story bg-white dark:bg-[#162A1F] p-5 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+              <span className="font-display text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">23</span>
+              <span className="font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] block mt-1">ACTIVITIES DONE</span>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 shadow-sm text-center">
+
+            <div className="card-story bg-white dark:bg-[#162A1F] p-5 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
               <div className="flex items-center justify-center gap-1">
-                <Flame className="w-5 h-5 text-[#C66B44]" />
-                <span className="text-2xl font-extrabold text-[#1E3A2F]">7</span>
+                <Flame className="w-5 h-5 text-[#C06A44]" />
+                <span className="font-display text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">7</span>
               </div>
-              <span className="block text-xs font-bold text-[#52635D] mt-1">Day Streak</span>
+              <span className="font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] block mt-1">DAY STREAK</span>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 shadow-sm text-center">
-              <span className="block text-2xl font-extrabold text-[#1E3A2F]">78%</span>
-              <span className="flex items-center justify-center gap-1 text-xs font-bold text-[#52635D] mt-1">
-                <Brain className="w-3 h-3" /> Memory
-              </span>
+
+            <div className="card-story bg-white dark:bg-[#162A1F] p-5 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+              <span className="font-display text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">78%</span>
+              <span className="font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] block mt-1">MEMORY RECALL</span>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 shadow-sm text-center">
-              <span className="block text-2xl font-extrabold text-[#1E3A2F]">82%</span>
-              <span className="flex items-center justify-center gap-1 text-xs font-bold text-[#52635D] mt-1">
-                <Eye className="w-3 h-3" /> Attention
-              </span>
+
+            <div className="card-story bg-white dark:bg-[#162A1F] p-5 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+              <span className="font-display text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">82%</span>
+              <span className="font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] block mt-1">VISUAL FOCUS</span>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-[#2D4739]/10 shadow-sm text-center col-span-2 sm:col-span-1">
-              <span className="block text-2xl font-extrabold text-emerald-600">+12%</span>
-              <span className="block text-xs font-bold text-[#52635D] mt-1">Weekly Improvement</span>
+
+            <div className="card-story bg-white dark:bg-[#162A1F] p-5 text-center border border-[#2D4739]/15 dark:border-[#D4AF37]/20 col-span-2 sm:col-span-1">
+              <span className="font-display text-3xl font-bold text-[#7B9E87]">+12%</span>
+              <span className="font-mono-label text-[10px] text-[#5A7265] dark:text-[#9DBFB0] block mt-1">WEEKLY TREND</span>
             </div>
           </div>
         </div>
 
-        {/* ── RECOMMENDED FOR YOU ── */}
-        <div className="animate-slide-in-up-delay-3">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-extrabold text-[#1E3A2F] flex items-center gap-2">
+        {/* ── RECOMMENDED ACTIVITIES ── */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-2xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-2">
               <Zap className="w-5 h-5 text-[#D4AF37]" />
-              Recommended For You
+              Recommended Activities
             </h2>
             <button
               onClick={() => onNavigate('games-hub')}
-              className="text-sm font-bold text-[#C66B44] hover:text-[#D4AF37] cursor-pointer transition-colors flex items-center gap-1"
+              className="text-xs font-bold text-[#C06A44] dark:text-[#D4AF37] hover:underline flex items-center gap-1 cursor-pointer"
             >
-              View All <ArrowRight className="w-4 h-4" />
+              Explore All <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {recommendations.map((activity) => (
               <button
                 key={activity.id}
                 onClick={() => { soundSynth.playSoftClick(); onNavigate(activity.view); }}
-                className="card-lift group bg-white rounded-2xl p-5 border border-[#2D4739]/10 text-left shadow-sm cursor-pointer focus-accessible"
+                className="card-story group bg-white dark:bg-[#162A1F] p-6 text-left border border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37] cursor-pointer"
               >
                 <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: `${activity.color}15` }}
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:scale-105 transition-transform"
+                  style={{ backgroundColor: `${activity.color}20` }}
                 >
                   {activity.icon}
                 </div>
-                <h3 className="font-bold text-base text-[#1E3A2F] mb-1">{activity.name}</h3>
-                <div className="flex items-center gap-2 text-xs text-[#52635D] font-semibold">
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {activity.time}</span>
-                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                    {activity.difficulty}
-                  </span>
+                <h3 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-1">
+                  {activity.name}
+                </h3>
+                <div className="flex items-center gap-3 text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-2">
+                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#D4AF37]" /> {activity.time}</span>
+                  <span>•</span>
+                  <span className="font-semibold text-[#7B9E87]">{activity.difficulty}</span>
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* ── DAILY ROUTINE PREVIEW + QUICK ACTIONS ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* Daily Routine Preview */}
-          <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-extrabold text-[#1E3A2F] flex items-center gap-2">
-                <CalendarCheck className="w-5 h-5 text-[#6A9B96]" />
+        {/* ── ROUTINE & QUICK ACTIONS SPLIT ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Today's Routine Preview */}
+          <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-2">
+                <CalendarCheck className="w-5 h-5 text-[#7B9E87]" />
                 Today's Routine
               </h3>
               <button
                 onClick={() => onNavigate('daily-routine')}
-                className="text-xs font-bold text-[#C66B44] cursor-pointer"
+                className="text-xs font-bold text-[#C06A44] dark:text-[#D4AF37] cursor-pointer"
               >
-                View All →
+                Full Routine →
               </button>
             </div>
-            <div className="space-y-3">
+
+            <div className="space-y-4">
               {[
-                { time: '7:00 AM', task: 'Morning medicine', icon: '💊', done: true },
-                { time: '7:30 AM', task: 'Breakfast', icon: '🍵', done: true },
-                { time: '9:00 AM', task: 'Cognitive session', icon: '🧩', done: false },
-                { time: '12:30 PM', task: 'Lunch', icon: '🍛', done: false },
+                { time: '7:00 AM', task: 'Morning medication', icon: '💊', done: true },
+                { time: '7:30 AM', task: 'Morning Red Tea (Lal Saah)', icon: '🍵', done: true },
+                { time: '9:00 AM', task: 'Memory Activity in Courtyard', icon: '🧩', done: false },
+                { time: '12:30 PM', task: 'Afternoon Lunch', icon: '🍛', done: false },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ${
-                    item.done ? 'bg-emerald-100' : 'bg-[#F5EFE6]'
+                <div key={i} className="flex items-center gap-4 p-3 rounded-2xl bg-[#FDFBF7] dark:bg-[#0F2219] border border-[#2D4739]/10 dark:border-[#D4AF37]/15">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
+                    item.done ? 'bg-[#7B9E87]/20 text-[#7B9E87]' : 'bg-[#F5EEE2] dark:bg-[#1A3328] text-[#1A2F24] dark:text-[#F2EDE3]'
                   }`}>
                     {item.done ? '✓' : item.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className={`block text-sm font-bold ${item.done ? 'text-[#52635D] line-through' : 'text-[#1E3A2F]'}`}>
+                    <span className={`block text-sm font-semibold ${item.done ? 'text-[#5A7265] dark:text-[#9DBFB0] line-through' : 'text-[#1A2F24] dark:text-[#F2EDE3]'}`}>
                       {item.task}
                     </span>
                   </div>
-                  <span className="text-xs font-semibold text-[#6A9B96] shrink-0">{item.time}</span>
+                  <span className="font-mono-label text-[10px] text-[#7B9E87] shrink-0">{item.time}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-3xl p-6 border border-[#2D4739]/10 shadow-sm">
-            <h3 className="text-base font-extrabold text-[#1E3A2F] mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="card-story bg-white dark:bg-[#162A1F] p-8 border border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+            <h3 className="font-display text-xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] mb-6">
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
               {[
-                { label: 'Start Activity', icon: <Play className="w-6 h-6" />, view: 'games-hub' as ActiveView, bg: 'bg-[#1E3A2F]', text: 'text-[#FDFBF7]', iconColor: 'text-[#D4AF37]' },
-                { label: 'View Progress', icon: <BarChart3 className="w-6 h-6" />, view: 'progress' as ActiveView, bg: 'bg-[#6A9B96]/15', text: 'text-[#1E3A2F]', iconColor: 'text-[#6A9B96]' },
-                { label: 'Daily Recall', icon: <CalendarCheck className="w-6 h-6" />, view: 'daily-routine' as ActiveView, bg: 'bg-[#D4AF37]/15', text: 'text-[#1E3A2F]', iconColor: 'text-[#D4AF37]' },
-                { label: 'Ask for Help', icon: <HelpCircle className="w-6 h-6" />, view: 'settings' as ActiveView, bg: 'bg-[#C66B44]/15', text: 'text-[#1E3A2F]', iconColor: 'text-[#C66B44]' },
+                { label: 'Start Activity', icon: <Play className="w-5 h-5 text-[#D4AF37]" />, view: 'games-hub' as ActiveView, bg: 'bg-[#1E3A2F]', text: 'text-white' },
+                { label: 'View Progress', icon: <BarChart3 className="w-5 h-5 text-[#7B9E87]" />, view: 'progress' as ActiveView, bg: 'bg-[#F5EEE2] dark:bg-[#1A3328]', text: 'text-[#1A2F24] dark:text-[#F2EDE3]' },
+                { label: 'Daily Routine', icon: <CalendarCheck className="w-5 h-5 text-[#D4AF37]" />, view: 'daily-routine' as ActiveView, bg: 'bg-[#F5EEE2] dark:bg-[#1A3328]', text: 'text-[#1A2F24] dark:text-[#F2EDE3]' },
+                { label: 'Talk to Companion', icon: <HelpCircle className="w-5 h-5 text-[#C06A44]" />, view: 'settings' as ActiveView, bg: 'bg-[#F5EEE2] dark:bg-[#1A3328]', text: 'text-[#1A2F24] dark:text-[#F2EDE3]' },
               ].map((action) => (
                 <button
                   key={action.label}
                   onClick={() => {
                     soundSynth.playSoftClick();
-                    if (action.label === 'Ask for Help') {
+                    if (action.label === 'Talk to Companion') {
                       onOpenCompanion();
                     } else {
                       onNavigate(action.view);
                     }
                   }}
-                  className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl ${action.bg} ${action.text} font-bold text-sm cursor-pointer hover:scale-105 transition-all focus-accessible`}
+                  className={`flex flex-col items-center justify-center gap-3 p-5 rounded-2xl ${action.bg} ${action.text} font-bold text-xs cursor-pointer hover:scale-[1.02] transition-transform`}
                 >
-                  <span className={action.iconColor}>{action.icon}</span>
-                  <span className="text-xs">{action.label}</span>
+                  {action.icon}
+                  <span>{action.label}</span>
                 </button>
               ))}
             </div>

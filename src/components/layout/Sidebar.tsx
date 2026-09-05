@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Gamepad2, CalendarCheck, BarChart3, Users, Settings, Mic, LogOut } from 'lucide-react';
+import { Home, Gamepad2, CalendarCheck, BarChart3, Users, Settings, Mic } from 'lucide-react';
 import { ActiveView } from '../../types';
 
 interface SidebarProps {
@@ -9,10 +9,10 @@ interface SidebarProps {
   userName?: string;
 }
 
-const NAV_ITEMS: { id: ActiveView; label: string; icon: React.ElementType; }[] = [
-  { id: 'patient-app', label: 'Home', icon: Home },
+const NAV_ITEMS: { id: ActiveView; label: string; icon: React.ElementType }[] = [
+  { id: 'patient-app', label: 'Courtyard', icon: Home },
   { id: 'games-hub', label: 'Activities', icon: Gamepad2 },
-  { id: 'daily-routine', label: 'Daily Routine', icon: CalendarCheck },
+  { id: 'daily-routine', label: 'Routine', icon: CalendarCheck },
   { id: 'progress', label: 'Progress', icon: BarChart3 },
   { id: 'caregiver-portal', label: 'Caregiver', icon: Users },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -39,76 +39,83 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className="hidden lg:flex flex-col w-[260px] min-h-screen bg-white border-r border-[#2D4739]/10 py-6 px-4 shrink-0 sticky top-0 h-screen"
+      className="hidden lg:flex flex-col w-[250px] min-h-screen bg-[#1E3A2F] text-[#FDFBF7] border-r border-[#D4AF37]/15 py-6 px-4 shrink-0 sticky top-0 h-screen justify-between z-30 select-none"
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* Logo */}
-      <button
-        onClick={() => onNavigate('home')}
-        className="flex items-center gap-3 px-3 mb-8 cursor-pointer group"
-        aria-label="Go to home page"
-      >
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1E3A2F] to-[#2D4739] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-          <span className="text-2xl">🌿</span>
-        </div>
-        <div>
-          <span className="block text-lg font-extrabold font-heading text-[#1E3A2F] leading-tight">Vanika</span>
-          <span className="block text-[10px] font-bold text-[#6A9B96] uppercase tracking-wider">Cognitive Care</span>
-        </div>
-      </button>
+      <div>
+        {/* Brand Header */}
+        <button
+          onClick={() => onNavigate('home')}
+          className="flex items-center gap-3 px-3 mb-8 cursor-pointer group text-left w-full"
+          aria-label="Go to home page"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 transition-transform">
+            🌿
+          </div>
+          <div>
+            <span className="block font-display text-xl font-bold text-[#FDFBF7] tracking-tight leading-none">
+              Vanika
+            </span>
+            <span className="block font-mono-label text-[10px] text-[#A8C4B2] mt-1 tracking-widest">
+              COGNITIVE CARE
+            </span>
+          </div>
+        </button>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 space-y-1.5">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.id);
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all cursor-pointer focus-accessible ${
-                active
-                  ? 'bg-[#1E3A2F] text-[#FDFBF7] shadow-md'
-                  : 'text-[#52635D] hover:bg-[#F5EFE6] hover:text-[#1E3A2F]'
-              }`}
-              aria-current={active ? 'page' : undefined}
-            >
-              <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#D4AF37]' : ''}`} />
-              <span>{item.label}</span>
-              {active && (
-                <div className="ml-auto w-2 h-2 rounded-full bg-[#D4AF37]" />
-              )}
-            </button>
-          );
-        })}
-      </nav>
+        {/* Navigation Items */}
+        <nav className="space-y-1.5" aria-label="Sidebar navigation">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.id);
+            return (
+              <button
+                key={item.id}
+                onClick={() => onNavigate(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all cursor-pointer ${
+                  active
+                    ? 'bg-[#2D4739] text-[#FDFBF7] shadow-md border border-[#D4AF37]/30 font-bold'
+                    : 'text-[#C8D8CF] hover:bg-[#2D4739]/50 hover:text-[#FDFBF7]'
+                }`}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#D4AF37]' : 'text-[#A8C4B2]'}`} />
+                <span>{item.label}</span>
+                {active && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
 
-      {/* Voice Assistant Button */}
-      <button
-        onClick={onOpenCompanion}
-        className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#E5C45B] text-[#1E3A2F] font-extrabold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer mb-4"
-        aria-label="Talk to voice assistant"
-      >
-        <div className="w-8 h-8 rounded-xl bg-[#1E3A2F]/15 flex items-center justify-center">
-          <Mic className="w-4 h-4" />
-        </div>
-        <span>Talk to Oja</span>
-        <div className="ml-auto w-2 h-2 rounded-full bg-[#1E3A2F] animate-status-pulse" />
-      </button>
+      {/* Footer Area: Companion & Profile */}
+      <div className="space-y-3 pt-4 border-t border-[#2D4739]">
+        {/* Companion Trigger */}
+        <button
+          onClick={onOpenCompanion}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#C8A94A] text-[#1E3A2F] font-bold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer"
+          aria-label="Talk to voice assistant Oja"
+        >
+          <div className="w-7 h-7 rounded-lg bg-[#1E3A2F]/15 flex items-center justify-center">
+            <Mic className="w-4 h-4 text-[#1E3A2F]" />
+          </div>
+          <span>Talk to Oja</span>
+          <div className="ml-auto w-2 h-2 rounded-full bg-[#1E3A2F] animate-status-pulse" />
+        </button>
 
-      {/* User Profile */}
-      <div className="border-t border-[#2D4739]/10 pt-4">
+        {/* User Card */}
         <button
           onClick={() => onNavigate('settings')}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-[#F5EFE6] transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-[#2D4739]/60 transition-colors cursor-pointer text-left"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center text-xl">
+          <div className="w-9 h-9 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center text-lg shrink-0">
             👴🏽
           </div>
-          <div className="text-left flex-1 min-w-0">
-            <span className="block text-sm font-bold text-[#1E3A2F] truncate">{userName}</span>
-            <span className="block text-xs text-[#6A9B96]">Elder Profile</span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-xs font-bold text-[#FDFBF7] truncate">{userName}</span>
+            <span className="block text-[11px] text-[#A8C4B2]">Personal Account</span>
           </div>
         </button>
       </div>

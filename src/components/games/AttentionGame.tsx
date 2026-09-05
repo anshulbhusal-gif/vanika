@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, Sparkles, CheckCircle2, Lightbulb, HelpCircle, Heart } from 'lucide-react';
+import { ArrowLeft, Eye, Sparkles, CheckCircle2, Lightbulb } from 'lucide-react';
 import { soundSynth } from '../../utils/audioSynth';
-import { VoiceAssistant, speechEngine } from '../../utils/speech';
+import { speechEngine } from '../../utils/speech';
 import { vanikaStorage } from '../../utils/storage';
 import confetti from 'canvas-confetti';
 import { Language } from '../../types';
@@ -17,7 +17,7 @@ interface DifferenceItem {
   id: string;
   name: string;
   hint: string;
-  xPercent: number; // 0 to 100 for canvas hotspot
+  xPercent: number;
   yPercent: number;
   found: boolean;
 }
@@ -72,7 +72,6 @@ export const AttentionGame: React.FC<AttentionGameProps> = ({ currentLanguage, o
     setDifferences(updated);
 
     const newFoundCount = updated.filter(d => d.found).length;
-    // Record visual attention score in local vault
     vanikaStorage.recordGameSession('attention', 75 + newFoundCount * 6, 3);
 
     if (newFoundCount === differences.length) {
@@ -81,17 +80,13 @@ export const AttentionGame: React.FC<AttentionGameProps> = ({ currentLanguage, o
         particleCount: 60,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#0284C7', '#315C4C', '#EAB308']
+        colors: ['#1E3A2F', '#D4AF37', '#7B9E87']
       });
       speechEngine.speak('Splendid observation! Your eyes are as sharp as clear river water.', { language: currentLanguage });
     } else {
       speechEngine.speak(`Well spotted! You found the ${target.name}.`, { language: currentLanguage });
     }
   };
-
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [isListening, setIsListening] = useState(false);
 
   const handleShowHint = () => {
     const unFound = differences.find(d => !d.found);
@@ -106,198 +101,160 @@ export const AttentionGame: React.FC<AttentionGameProps> = ({ currentLanguage, o
     }
   };
 
-  const handleVoiceAnswer = () => {
-    if (isListening) {
-      speechEngine.stopListening();
-      setIsListening(false);
-      return;
-    }
-
-    setIsListening(true);
-    soundSynth.playSoftClick();
-    speechEngine.speak('Speak the item name you see in the photo', { language: currentLanguage });
-
-    speechEngine.startListening(
-      (transcript) => {
-        setIsListening(false);
-        const lower = transcript.toLowerCase();
-        differences.forEach(diff => {
-          if (!diff.found) {
-            const words = diff.name.toLowerCase().split(' ');
-            if (words.some(w => w.length > 3 && lower.includes(w))) {
-              handleSpotDifference(diff.id);
-            }
-          }
-        });
-      },
-      (err) => {
-        setIsListening(false);
-      },
-      () => {
-        setIsListening(false);
-      },
-      currentLanguage
-    );
-  };
-
   return (
-    <div className="max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6" id="view-game-attention">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#315C4C]/15">
-        <div className="flex items-center gap-3">
-          {onBackToApp && (
-            <button
-              onClick={() => {
-                soundSynth.playSoftClick();
-                onBackToApp();
-              }}
-              className="p-2.5 rounded-xl bg-[#EDE5D2] text-[#24483C] hover:bg-[#315C4C] hover:text-[#F8F4EA] transition-colors cursor-pointer"
-              title="Return to Courtyard"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          )}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">👀</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#24483C]">
-                Tea Garden Visual Scan
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-[#4A5B55]">
-              Spot the subtle differences in this tranquil Majuli & Tea Garden landscape
-            </p>
-          </div>
-        </div>
-
-        {/* Found Counter & Voice Button */}
-        <div className="flex items-center gap-3">
-          <GameVoiceAnswerButton
-            options={differences.map((d) => d.name)}
-            onOptionMatched={(matchedOption) => {
-              const matched = differences.find((d) => d.name.toLowerCase() === matchedOption.toLowerCase());
-              if (matched) {
-                handleSpotDifference(matched.id);
-              }
-            }}
-            currentLanguage={currentLanguage}
-            promptMessage="Speak the item name you see in the photo"
-            disabled={isAllFound}
-            label="Speak Item"
-          />
-
-          <div className="bg-[#7EA9A5]/20 border border-[#7EA9A5]/50 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-[#24483C] flex items-center gap-1.5">
-            <Eye className="w-4 h-4 text-[#315C4C]" />
-            <span>Found: {foundCount} of {differences.length}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Visual Board */}
-      <div className="bg-[#FDFBF7] border-3 border-[#315C4C] rounded-3xl p-6 sm:p-8 shadow-xl text-[#24332E]">
-        {/* Interactive Landscape Display */}
-        <div className="relative w-full rounded-2xl overflow-hidden shadow-lg border-2 border-[#EDE5D2] bg-[#F4EFE2]">
-          <SafeImage
-            src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80"
-            alt="Tranquil North Eastern Tea Garden and River Scene"
-            className="w-full h-72 sm:h-96 opacity-90"
-          />
-
-          {/* Interactive Clickable Hotspots overlay */}
-          {differences.map((diff) => (
-            <button
-              key={diff.id}
-              onClick={() => handleSpotDifference(diff.id)}
-              style={{ top: `${diff.yPercent}%`, left: `${diff.xPercent}%` }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                diff.found
-                  ? 'bg-emerald-600/90 text-white ring-4 ring-white shadow-lg scale-110'
-                  : 'bg-[#D9A441]/80 text-[#24483C] hover:scale-125 animate-pulse shadow-md'
-              }`}
-              title={diff.found ? diff.name : 'Click to inspect this spot'}
-            >
-              {diff.found ? (
-                <CheckCircle2 className="w-6 h-6" />
-              ) : (
-                <span className="text-xs font-extrabold">🔍</span>
-              )}
-            </button>
-          ))}
-
-          {/* Calm Hint Pill */}
-          {activeHint && (
-            <div className="absolute bottom-4 left-4 right-4 bg-[#24483C]/95 text-[#F8F4EA] p-3.5 rounded-2xl text-center text-sm font-semibold shadow-xl backdrop-blur-xs animate-fadeIn flex items-center justify-center gap-2">
-              <Lightbulb className="w-5 h-5 text-[#D9A441] shrink-0" />
-              <span>{activeHint}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Found Items Checklist */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-bold text-lg text-[#24483C]">
-              Items to Discover in the Landscape:
-            </h3>
-            <button
-              onClick={handleShowHint}
-              disabled={isAllFound}
-              className="px-4 py-2 rounded-xl bg-[#EDE5D2] hover:bg-[#DE8F6E]/20 text-[#24483C] text-xs sm:text-sm font-bold border border-[#315C4C]/25 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
-            >
-              <Lightbulb className="w-4 h-4 text-[#D9A441]" />
-              <span>Need a gentle hint?</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {differences.map((diff) => (
-              <div
-                key={diff.id}
-                onClick={() => handleSpotDifference(diff.id)}
-                className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between cursor-pointer ${
-                  diff.found
-                    ? 'bg-emerald-50 border-emerald-400 text-emerald-900 shadow-xs'
-                    : 'bg-[#F8F4EA] border-[#315C4C]/20 hover:bg-[#EDE5D2]'
-                }`}
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0C1A11] py-8 sm:py-12" id="view-game-attention">
+      <div className="section-max max-w-4xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#2D4739]/15 dark:border-[#D4AF37]/20">
+          <div className="flex items-center gap-4">
+            {onBackToApp && (
+              <button
+                onClick={() => {
+                  soundSynth.playSoftClick();
+                  onBackToApp();
+                }}
+                className="w-10 h-10 rounded-xl bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 dark:border-[#D4AF37]/25 text-[#1A2F24] dark:text-[#F2EDE3] flex items-center justify-center cursor-pointer hover:border-[#D4AF37]"
+                title="Return to Courtyard"
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                      diff.found ? 'bg-emerald-600 text-white' : 'bg-[#315C4C] text-[#F8F4EA]'
-                    }`}
-                  >
-                    {diff.found ? '✓' : '•'}
-                  </div>
-                  <div>
-                    <h4 className="font-heading font-bold text-sm sm:text-base">
-                      {diff.name}
-                    </h4>
-                    <p className="text-xs opacity-75">{diff.hint}</p>
-                  </div>
-                </div>
-
-                {diff.found && (
-                  <span className="text-xs font-bold text-emerald-700 uppercase">
-                    Discovered
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Completion Card */}
-        {isAllFound && (
-          <div className="mt-6 p-5 rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-emerald-950 flex items-center gap-3 animate-fadeIn">
-            <CheckCircle2 className="w-7 h-7 text-emerald-700 shrink-0" />
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
             <div>
-              <h4 className="font-bold text-lg">Peaceful Clarity!</h4>
-              <p className="text-sm text-emerald-800">
-                You have spotted all 4 peaceful elements with calm attention and focus.
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">👀</span>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                  Tea Garden Visual Scan
+                </h2>
+              </div>
+              <p className="font-mono-label text-xs text-[#7B9E87] mt-0.5">
+                SPOT SUBTLE LANDSCAPE DIFFERENCES IN MAJULI & TEA HILLS
               </p>
             </div>
           </div>
-        )}
+
+          <div className="flex items-center gap-3">
+            <GameVoiceAnswerButton
+              options={differences.map((d) => d.name)}
+              onOptionMatched={(matchedOption) => {
+                const matched = differences.find((d) => d.name.toLowerCase() === matchedOption.toLowerCase());
+                if (matched) {
+                  handleSpotDifference(matched.id);
+                }
+              }}
+              currentLanguage={currentLanguage}
+              promptMessage="Speak the item name you see in the photo"
+              disabled={isAllFound}
+              label="Speak Item"
+            />
+
+            <div className="bg-[#1E3A2F] text-[#D4AF37] px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              <span>Found: {foundCount} of {differences.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Board */}
+        <div className="card-story bg-white dark:bg-[#162A1F] p-8 sm:p-10 border border-[#2D4739]/15 dark:border-[#D4AF37]/25 shadow-xl">
+          <div className="relative w-full rounded-2xl overflow-hidden shadow-md border border-[#2D4739]/15 dark:border-[#D4AF37]/20 bg-[#F5EEE2] dark:bg-[#1A3328]">
+            <SafeImage
+              src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80"
+              alt="Tranquil North Eastern Tea Garden Scene"
+              className="w-full h-72 sm:h-96 opacity-90"
+            />
+
+            {/* Hotspots */}
+            {differences.map((diff) => (
+              <button
+                key={diff.id}
+                onClick={() => handleSpotDifference(diff.id)}
+                style={{ top: `${diff.yPercent}%`, left: `${diff.xPercent}%` }}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  diff.found
+                    ? 'bg-[#1E3A2F] text-[#D4AF37] border-2 border-[#D4AF37] shadow-lg scale-110'
+                    : 'bg-[#D4AF37] text-[#1E3A2F] hover:scale-125 animate-pulse shadow-md font-bold'
+                }`}
+                title={diff.found ? diff.name : 'Click to inspect'}
+              >
+                {diff.found ? <CheckCircle2 className="w-5 h-5" /> : <span>🔍</span>}
+              </button>
+            ))}
+
+            {/* Hint Banner */}
+            {activeHint && (
+              <div className="absolute bottom-4 left-4 right-4 bg-[#1E3A2F]/95 text-[#FDFBF7] p-4 rounded-2xl text-center text-xs font-semibold shadow-xl border border-[#D4AF37]/30 flex items-center justify-center gap-2 animate-slide-up">
+                <Lightbulb className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                <span>{activeHint}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Checklist */}
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                Items to Discover in the Landscape:
+              </h3>
+              <button
+                onClick={handleShowHint}
+                disabled={isAllFound}
+                className="btn-ghost py-2 px-4 text-xs font-semibold"
+              >
+                <Lightbulb className="w-4 h-4 text-[#D4AF37]" />
+                <span>Need a hint?</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {differences.map((diff) => (
+                <div
+                  key={diff.id}
+                  onClick={() => handleSpotDifference(diff.id)}
+                  className={`card-story p-4 flex items-center justify-between cursor-pointer border transition-all ${
+                    diff.found
+                      ? 'bg-[#7B9E87]/15 border-[#7B9E87] text-[#1A2F24] dark:text-[#F2EDE3]'
+                      : 'bg-[#FDFBF7] dark:bg-[#0F2219] border-[#2D4739]/15 dark:border-[#D4AF37]/20 hover:border-[#D4AF37]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                      diff.found ? 'bg-[#1E3A2F] text-[#D4AF37]' : 'bg-[#F5EEE2] dark:bg-[#1A3328] text-[#5A7265]'
+                    }`}>
+                      {diff.found ? '✓' : '•'}
+                    </div>
+                    <div>
+                      <h4 className="font-display text-sm font-bold text-[#1A2F24] dark:text-[#F2EDE3]">
+                        {diff.name}
+                      </h4>
+                      <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-0.5">{diff.hint}</p>
+                    </div>
+                  </div>
+
+                  {diff.found && (
+                    <span className="font-mono-label text-[10px] text-[#7B9E87] font-bold uppercase">
+                      Found
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Completion Banner */}
+          {isAllFound && (
+            <div className="mt-8 p-6 rounded-2xl bg-[#7B9E87]/15 border border-[#7B9E87] text-[#1A2F24] dark:text-[#F2EDE3] flex items-center gap-4 animate-slide-up">
+              <CheckCircle2 className="w-8 h-8 text-[#7B9E87] shrink-0" />
+              <div>
+                <h4 className="font-display text-xl font-bold">Peaceful Clarity!</h4>
+                <p className="text-xs text-[#5A7265] dark:text-[#9DBFB0] mt-1">
+                  You have spotted all 4 elements in the tea landscape with calm focus.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

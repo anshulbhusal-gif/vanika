@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Phone, Lock, ArrowRight, Globe, Heart } from 'lucide-react';
+import { Eye, EyeOff, Phone, Lock, ArrowRight, Globe, Heart, Leaf } from 'lucide-react';
 import { ActiveView, Language } from '../../types';
 import { NER_LANGUAGES } from '../../data/mockData';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +26,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     e.preventDefault();
     setErrorMessage('');
 
-    // Client-side validation
     const identifier = phone.trim();
     if (!identifier) {
       setErrorMessage('Please enter your phone number or email address.');
@@ -37,11 +36,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
 
-    if (isLoading) return; // prevent double-submission
+    if (isLoading) return;
     setIsLoading(true);
     try {
       const loggedInUser = await auth.login(identifier, password);
-      // Role-based redirect using the returned user
       const role = loggedInUser?.role ?? 'ELDER';
       if (role === 'CAREGIVER' || role === 'ADMIN') {
         onNavigate('caregiver-portal');
@@ -50,7 +48,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       }
     } catch (err: any) {
       const msg = err?.message || '';
-      // Friendly error mapping — never expose internals
       if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials') || msg.toLowerCase().includes('password') || msg.toLowerCase().includes('not found')) {
         setErrorMessage('The phone number, email or password you entered is incorrect. Please try again.');
       } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('failed to fetch')) {
@@ -66,91 +63,97 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex" id="view-login">
-      {/* Left: Illustration Panel (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#1E3A2F] via-[#2D4739] to-[#1E3A2F] items-center justify-center overflow-hidden">
-        {/* Ambient orbs */}
-        <div className="absolute top-10 left-10 w-72 h-72 bg-[#D4AF37]/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-64 h-64 bg-[#C66B44]/12 rounded-full blur-3xl" />
-        <div className="absolute inset-0 bg-ner-weave-dark opacity-40 pointer-events-none" />
+    <div className="min-h-screen flex bg-[#FDFBF7] dark:bg-[#0C1A11]" id="view-login">
+      {/* Left: Editorial Landscape Panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-[#1E3A2F] text-[#FDFBF7] items-center justify-center overflow-hidden p-16">
+        <div className="hero-orb-gold -top-20 -left-20" />
+        <div className="hero-orb-emerald bottom-10 right-0" />
+        <div className="absolute inset-0 bg-ner-weave-dark opacity-35 pointer-events-none" />
 
-        <div className="relative z-10 text-center px-12 max-w-lg">
-          {/* Decorative illustration */}
-          <div className="w-40 h-40 mx-auto mb-8 rounded-3xl bg-[#D4AF37]/20 border-2 border-[#D4AF37]/30 flex items-center justify-center animate-companion-breathe">
-            <span className="text-8xl">🧠</span>
+        <div className="relative z-10 text-center max-w-lg space-y-6">
+          <div className="w-24 h-24 mx-auto rounded-3xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-4xl shadow-md animate-companion-breathe">
+            🌿
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#FDFBF7] leading-tight mb-4">
-            Keep Your Mind<br />Active & Connected
+          
+          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-[#FDFBF7] leading-tight">
+            A gentle space <br />for your memories.
           </h2>
-          <p className="text-base text-[#EAE2D2]/80 leading-relaxed">
-            Personalized cognitive activities designed to support memory, attention and everyday mental wellness — in your language.
+
+          <p className="prose-elder text-[#C8D8CF] text-base leading-relaxed">
+            Voice-guided cognitive activities rooted in the heritage, songs, and languages of North Eastern India.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-[#D4AF37]/80">
+
+          <div className="pt-6 flex items-center justify-center gap-6 font-mono-label text-xs text-[#D4AF37]">
             <span className="flex items-center gap-1.5">
               <Heart className="w-4 h-4" />
-              Voice-First
+              VOICE-FIRST
             </span>
-            <span className="w-1 h-1 rounded-full bg-[#D4AF37]/40" />
-            <span>6 NER Languages</span>
-            <span className="w-1 h-1 rounded-full bg-[#D4AF37]/40" />
-            <span>100% Offline</span>
+            <span>•</span>
+            <span>6 NER LANGUAGES</span>
+            <span>•</span>
+            <span>100% OFFLINE</span>
           </div>
         </div>
       </div>
 
-      {/* Right: Login Form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-[#FDFBF7]">
-        <div className="w-full max-w-md">
-          {/* Language selector at top */}
-          <div className="flex justify-end mb-8">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-[#2D4739]/15 shadow-sm">
-              <Globe className="w-4 h-4 text-[#6A9B96]" />
-              <select
-                value={currentLanguage}
-                onChange={(e) => onSelectLanguage(e.target.value as Language)}
-                className="bg-transparent text-sm font-bold text-[#1E3A2F] focus:outline-none cursor-pointer"
-                aria-label="Select language"
-              >
-                {NER_LANGUAGES.slice(0, 6).map((lang) => (
-                  <option key={lang.id} value={lang.id}>
-                    {lang.nativeScript}
-                  </option>
-                ))}
-              </select>
+      {/* Right: Sign-In Form */}
+      <div className="flex-1 flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-10 max-w-2xl mx-auto w-full">
+        {/* Top Navbar */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => onNavigate('home')}
+            className="flex items-center gap-2 cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#1E3A2F] text-[#D4AF37] flex items-center justify-center">
+              <Leaf className="w-4 h-4" />
             </div>
+            <span className="font-display text-lg font-bold text-[#1A2F24] dark:text-[#F2EDE3]">Vanika</span>
+          </button>
+
+          {/* Language dropdown */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#162A1F] border border-[#2D4739]/15 dark:border-[#D4AF37]/25 text-xs font-semibold">
+            <Globe className="w-3.5 h-3.5 text-[#7B9E87]" />
+            <select
+              value={currentLanguage}
+              onChange={(e) => onSelectLanguage(e.target.value as Language)}
+              className="bg-transparent text-[#1A2F24] dark:text-[#F2EDE3] font-bold focus:outline-none cursor-pointer"
+              aria-label="Select language"
+            >
+              {NER_LANGUAGES.slice(0, 6).map((lang) => (
+                <option key={lang.id} value={lang.id} className="dark:bg-[#162A1F]">
+                  {lang.nativeScript} ({lang.name})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Center Content */}
+        <div className="my-auto py-8">
+          <div className="mb-8">
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#1A2F24] dark:text-[#F2EDE3] tracking-tight">
+              Welcome back
+            </h1>
+            <p className="mt-2 text-sm text-[#5A7265] dark:text-[#9DBFB0]">
+              Sign in to return to your personal courtyard or caregiver dashboard
+            </p>
           </div>
 
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A2F] to-[#2D4739] flex items-center justify-center shadow-lg">
-                <span className="text-3xl">🌿</span>
-              </div>
-              <div className="text-left">
-                <h1 className="text-2xl font-extrabold font-heading text-[#1E3A2F] tracking-tight">Vanika</h1>
-                <p className="text-xs text-[#52635D] font-semibold">Cognitive Wellness</p>
-              </div>
-            </div>
-            <p className="text-lg font-bold text-[#1E3A2F]">Welcome back</p>
-            <p className="text-sm text-[#52635D] mt-1">Sign in to continue your wellness journey</p>
-          </div>
-
-          {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Phone / Email */}
+            {/* Identifier */}
             <div>
-              <label htmlFor="login-phone" className="block text-sm font-bold text-[#1E3A2F] mb-2">
+              <label htmlFor="login-phone" className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">
                 Phone Number or Email
               </label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6A9B96]" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7B9E87]" />
                 <input
                   id="login-phone"
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full pl-12 pr-4 py-4 text-base font-semibold rounded-2xl bg-white border-2 border-[#2D4739]/15 text-[#1E3A2F] placeholder-[#52635D]/50 focus:outline-none focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/15 transition-all"
+                  className="w-full pl-11 pr-4 py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-[#162A1F] border border-[#2D4739]/20 dark:border-[#D4AF37]/30 text-[#1A2F24] dark:text-[#F2EDE3] placeholder-[#5A7265]/50 focus:outline-none focus:border-[#D4AF37] transition-all"
                   autoComplete="tel"
                 />
               </div>
@@ -158,92 +161,81 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
             {/* Password */}
             <div>
-              <label htmlFor="login-password" className="block text-sm font-bold text-[#1E3A2F] mb-2">
+              <label htmlFor="login-password" className="block text-xs font-semibold text-[#1A2F24] dark:text-[#F2EDE3] mb-2 uppercase tracking-wider">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6A9B96]" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7B9E87]" />
                 <input
                   id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-4 text-base font-semibold rounded-2xl bg-white border-2 border-[#2D4739]/15 text-[#1E3A2F] placeholder-[#52635D]/50 focus:outline-none focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/15 transition-all"
+                  className="w-full pl-11 pr-11 py-3.5 text-sm font-semibold rounded-2xl bg-white dark:bg-[#162A1F] border border-[#2D4739]/20 dark:border-[#D4AF37]/30 text-[#1A2F24] dark:text-[#F2EDE3] placeholder-[#5A7265]/50 focus:outline-none focus:border-[#D4AF37] transition-all"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[#52635D] hover:text-[#1E3A2F] transition-colors cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#5A7265] hover:text-[#1A2F24] dark:hover:text-[#F2EDE3]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Forgot password */}
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="text-sm font-bold text-[#C66B44] hover:text-[#D4AF37] transition-colors cursor-pointer"
-              >
-                Forgot password?
-              </button>
-            </div>
-
             {/* Error Message */}
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold text-center">
+              <div className="p-3.5 rounded-xl bg-[#C06A44]/10 border border-[#C06A44]/30 text-[#C06A44] text-xs font-semibold text-center">
                 {errorMessage}
               </div>
             )}
 
-            {/* Login Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-2xl bg-[#1E3A2F] hover:bg-[#2D4739] text-[#FDFBF7] font-extrabold text-lg flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all cursor-pointer disabled:opacity-60 focus-accessible"
+              className="btn-primary w-full py-4 text-base"
               id="btn-login-submit"
             >
               {isLoading ? (
-                <div className="w-6 h-6 border-3 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
                   <span>Sign In</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-[#2D4739]/15" />
-            <span className="text-xs font-bold text-[#52635D] uppercase tracking-wider">or</span>
-            <div className="flex-1 h-px bg-[#2D4739]/15" />
-          </div>
-
-          {/* Create Account */}
-          <button
-            onClick={() => onNavigate('signup')}
-            className="w-full py-4 rounded-2xl bg-white border-2 border-[#2D4739]/15 text-[#1E3A2F] font-bold text-base hover:border-[#D4AF37] hover:shadow-md transition-all cursor-pointer focus-accessible"
-            id="btn-login-create-account"
-          >
-            Create New Account
-          </button>
-
-          {/* Skip to demo */}
-          <div className="text-center mt-6">
+          {/* Create Account Link */}
+          <div className="mt-8 pt-6 border-t border-[#2D4739]/10 dark:border-[#D4AF37]/15 text-center space-y-4">
             <button
-              onClick={() => onNavigate('home')}
-              className="text-sm font-semibold text-[#52635D] hover:text-[#C66B44] transition-colors cursor-pointer underline decoration-dashed underline-offset-4"
+              onClick={() => onNavigate('signup')}
+              className="btn-ghost w-full py-3.5 text-sm font-semibold"
+              id="btn-login-create-account"
             >
-              Skip to demo →
+              Create New Account
             </button>
+
+            <div>
+              <button
+                onClick={() => onNavigate('home')}
+                className="text-xs font-semibold text-[#5A7265] dark:text-[#9DBFB0] hover:text-[#C06A44] cursor-pointer"
+              >
+                Explore Vanika Demo →
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Footer info */}
+        <p className="text-[11px] text-[#5A7265] dark:text-[#9DBFB0] text-center">
+          Encrypted with local-first AES-256 security • DPDP Act 2023 Compliant
+        </p>
       </div>
     </div>
   );
