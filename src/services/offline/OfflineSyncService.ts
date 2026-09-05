@@ -5,10 +5,17 @@ export class OfflineSyncService {
   private static currentState: NetworkState = 'ONLINE';
   private static listeners: Array<(state: NetworkState) => void> = [];
 
-  public static initNetworkMonitoring(): void {
-    if (typeof window === 'undefined') return;
+  private static getOnlineState(): NetworkState {
+    if (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') {
+      return navigator.onLine ? 'ONLINE' : 'OFFLINE';
+    }
+    return this.currentState === 'OFFLINE' ? 'OFFLINE' : 'ONLINE';
+  }
 
-    this.currentState = navigator.onLine ? 'ONLINE' : 'OFFLINE';
+  public static initNetworkMonitoring(): void {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
+
+    this.currentState = this.getOnlineState();
 
     window.addEventListener('online', () => {
       this.setState('RECONNECTING');
@@ -46,7 +53,7 @@ export class OfflineSyncService {
     const pending = await OfflineStorageService.getPendingSessions();
 
     if (pending.length === 0) {
-      this.setState(navigator.onLine ? 'ONLINE' : 'OFFLINE');
+      this.setState(this.getOnlineState());
       return {
         totalPending: 0,
         syncedCount: 0,
@@ -77,7 +84,7 @@ export class OfflineSyncService {
     }
 
     await OfflineStorageService.removeSyncedSessions();
-    this.setState(navigator.onLine ? 'ONLINE' : 'OFFLINE');
+    this.setState(this.getOnlineState());
 
     return {
       totalPending: pending.length,
